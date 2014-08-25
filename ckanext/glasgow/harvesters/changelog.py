@@ -541,7 +541,12 @@ def handle_user_create(context, audit, harvest_object):
 
 
 def handle_user_update(context, audit, harvest_object):
-    username = audit['CustomProperties']['UserName']
+    try:
+        username = audit['CustomProperties']['UserName']
+    except:
+        user_id = audit['CustomProperties']['UserId']
+        ckan_user = p.toolkit.get_action('user_show')(context, {'id': user_id})
+        username = ckan_user['name']
 
     user = p.toolkit.get_action('ec_user_show')(
         context, {'ec_username': username})

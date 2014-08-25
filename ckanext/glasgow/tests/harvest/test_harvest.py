@@ -434,3 +434,55 @@ class TestChangeLogUserUpdate(object):
 
         membership = helpers.call_action('member_list', id='an_org')
         nt.assert_false(u'userid123' in set(i[0] for i in membership))
+
+    @mock.patch('requests.request')
+    def test_make_editor_admin(self, mock_request):
+        content = {"UserName": 'testuser',
+            "About": "about",
+            "DisplayName": "display name",
+            "Roles": ['OrganisationAdmin'],
+            "FirstName": "firstname",
+            "LastName": "lastname",
+            "UserId": "userid123",
+            "IsRegistered": False,
+            "OrganisationId": 'organisation123',
+            "Email": "em@il.com"
+        }
+        mock_request.return_value = mock.Mock(
+            status_code=200,
+            content=json.dumps(content),
+            **{
+                'raise_for_status.return_value': None,
+                'json.return_value': content,
+            }
+        )
+        site_user = helpers.call_action('get_site_user')
+        handle_user_update(
+            context={
+                'model': model,
+                'ignore_auth': True,
+                'local_action': True,
+                'user': site_user['name']
+            },
+            audit={'CustomProperties':{'UserId': self.test_user['id']}},
+            harvest_object=None,
+        )
+
+        user = helpers.call_action('user_show', id='testuser')
+        membership = helpers.call_action('member_list', id='organisation123')
+        nt.assert_dict_contains_subset(
+            {'about': u'about',
+             'display_name': u'display name',
+             'email_hash': '6dc2fde946483a1d8a84b89345a1b638',
+             'fullname': u'display name',
+             'id': u'userid123',
+             'name': u'testuser',
+             'state': u'active',
+             'sysadmin': False
+            },
+            user
+        )
+        nt.assert_equals(membership[1], (u'userid123', u'user', u'Admin'))
+
+        membership = helpers.call_action('member_list', id='an_org')
+        nt.assert_false(u'userid123' in set(i[0] for i in membership))
