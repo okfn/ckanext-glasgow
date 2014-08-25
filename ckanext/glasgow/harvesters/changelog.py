@@ -544,7 +544,7 @@ def handle_user_create(context, audit, harvest_object):
 
 def handle_user_update(context, audit, harvest_object):
     user_context = context.copy()
-    user_context['schema'] = custom_schema.user_schema()
+    user_context['schema'] = custom_schema.user_update_schema()
     try:
         username = audit['CustomProperties']['UserName']
     except:

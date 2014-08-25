@@ -6,6 +6,7 @@ from ckan.logic.schema import (
     default_group_schema,
     default_update_group_schema,
     default_user_schema,
+    default_update_user_schema,
     default_extras_schema,
     )
 
@@ -514,4 +515,11 @@ def user_schema():
     user_name_validator = get_validator('user_name_validator')
     schema = default_user_schema()
     schema['name'] = [not_empty, url_name_validator, user_name_validator, unicode]
+    return schema
+
+
+def user_update_schema():
+    user_name_validator = get_validator('user_name_validator')
+    schema = default_update_user_schema()
+    schema['name'] = [ignore_missing, url_name_validator, user_name_validator, unicode]
     return schema
