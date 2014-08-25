@@ -149,6 +149,8 @@ class EcChangelogHarvester(EcHarvester):
         except p.toolkit.ObjectNotFound, e:
             msg = e.message or str(e) or 'Object not found'
             self._save_object_error(msg, harvest_object, 'Import')
+        except Exception, e:
+            self._save_object_error(str(e), harvest_object, 'Import')
 
         return False
 
@@ -544,6 +546,8 @@ def handle_user_update(context, audit, harvest_object):
     try:
         username = audit['CustomProperties']['UserName']
     except:
+        # UserId is provided instead of UserName when ChangeUserRole
+        # command is issued.
         user_id = audit['CustomProperties']['UserId']
         ckan_user = p.toolkit.get_action('user_show')(context, {'id': user_id})
         username = ckan_user['name']
