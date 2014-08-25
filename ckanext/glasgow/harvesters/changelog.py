@@ -543,20 +543,27 @@ def handle_user_create(context, audit, harvest_object):
 
 
 def handle_user_update(context, audit, harvest_object):
+    user_context = context.copy()
+    user_context['schema'] = custom_schema.user_schema()
     try:
         username = audit['CustomProperties']['UserName']
     except:
         # UserId is provided instead of UserName when ChangeUserRole
         # command is issued.
         user_id = audit['CustomProperties']['UserId']
-        ckan_user = p.toolkit.get_action('user_show')(context, {'id': user_id})
+        ckan_user = p.toolkit.get_action('user_show')(
+            user_context, {'id': user_id})
         username = ckan_user['name']
 
     user = p.toolkit.get_action('ec_user_show')(
         context, {'ec_username': username})
     user_dict = custom_schema.convert_ec_user_to_ckan_user(user)
+    if not user_dict.get('email'):
+        user_dict['email'] = 'noemail'
+    if not user_dict.get('fullname'):
+        user_dict['fullname'] = user_dict.get('name')
 
-    ckan_user = p.toolkit.get_action('user_update')(context, user_dict)
+    ckan_user = p.toolkit.get_action('user_update')(user_context, user_dict)
 
     current_memberships = p.toolkit.get_action('organization_list_for_user')(
         context, {'user': ckan_user['name'], 'permission': 'create_dataset'})
