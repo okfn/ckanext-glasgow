@@ -160,10 +160,13 @@ def convert_ec_dataset_to_ckan_dataset(ec_dict):
         ckan_dict['id'] = unicode(ckan_dict['id'])
 
     # Arbitrary stuff stored as extras
-    ec_keys = [v for k, v in ckan_to_ec_dataset_mapping.iteritems()]
+    keys_to_avoid = [v for k, v in ckan_to_ec_dataset_mapping.iteritems()]
+
+    keys_to_avoid.extend(['CreatedBy'])
+
     ckan_dict['extras'] = []
     for key, value in ec_dict.iteritems():
-        if key not in ec_keys:
+        if key not in keys_to_avoid:
             ckan_dict['extras'].append({'key': key, 'value': value})
 
     return ckan_dict
@@ -198,9 +201,12 @@ def convert_ec_file_to_ckan_resource(ec_dict):
         if ec_dict.get(ec_name):
             ckan_dict[ckan_name] = ec_dict.get(ec_name)
 
-    ec_keys = [v for k, v in ckan_to_ec_resource_mapping.iteritems()]
+    keys_to_avoid = [v for k, v in ckan_to_ec_resource_mapping.iteritems()]
+
+    keys_to_avoid.extend(['CreatedBy'])
+
     for key, value in ec_dict.iteritems():
-        if key not in ec_keys:
+        if key not in keys_to_avoid:
             ckan_dict[key] = value
 
     return ckan_dict
