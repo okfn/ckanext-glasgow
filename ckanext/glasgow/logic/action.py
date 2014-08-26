@@ -2048,10 +2048,12 @@ def file_request_delete(context, data_dict):
         data_dict['name'] = resource_dict['name']
         data_dict['description'] = resource_dict['description']
 
+        dataset_id = resource_dict.get('package_id', resource_dict.get('DataSetId'))
+
         # Check if parent dataset exists
         try:
             dataset_dict = p.toolkit.get_action('package_show')(context,
-                                                                {'id': resource_dict.get('package_id')})
+                                                                {'id': dataset_id})
 
             data_dict['package_id'] = dataset_dict['id']
         except p.toolkit.ObjectNotFound:
