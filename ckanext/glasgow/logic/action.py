@@ -1657,7 +1657,7 @@ def organization_member_delete(context, data_dict):
         return core_actions.delete.organization_member_delete(context, data_dict)
     else:
         check_access('organization_member_delete', context, data_dict)
-        
+
         group_id = p.toolkit.get_or_bust(data_dict, 'id')
         user_id = data_dict.get('username')
         user_id = data_dict.get('user_id') if user_id is None else user_id
@@ -1699,7 +1699,7 @@ def user_role_delete(context, user, user_organization=None):
                                     key=key,
                                     value=None
                                     )
-    
+
 
     if user_organization:
         method, url = _get_api_endpoint('user_org_role_update')
@@ -2048,7 +2048,11 @@ def file_request_delete(context, data_dict):
         data_dict['name'] = resource_dict['name']
         data_dict['description'] = resource_dict['description']
 
-        dataset_id = resource_dict.get('package_id', resource_dict.get('DataSetId'))
+        dataset_id = (resource_dict.get('package_id') or
+                      resource_dict.get('DataSetId') or
+                      resource_dict.get('dataset_id'))
+        if not dataset_id:
+            raise p.toolkit.ObjectNotFound('Dataset not found')
 
         # Check if parent dataset exists
         try:

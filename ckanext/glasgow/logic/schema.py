@@ -71,7 +71,7 @@ ckan_to_ec_dataset_mapping = {
 
 ckan_to_ec_resource_mapping = {
     'id': 'FileId',
-    'package_id': 'DataSetId',
+    'dataset_id': 'DataSetId',
     'name': 'Title',
     'description': 'Description',
     'format': 'Type',
