@@ -34,20 +34,24 @@ CKAN Extensions specific to Open Glasgow
     # Local mock API
     #ckanext.glasgow.data_collection_api=http://localhost:7070
     #ckanext.glasgow.metadata_api=http://localhost:7070
-    ckanext.glasgow.data_collection_api=http://gccctpecdatacollectionservicesint.cloudapp.net:8080
-    ckanext.glasgow.metadata_api=http://gccctpecmetadataservicesint.cloudapp.net:8081
 
-    # Only if auth is not in place
-    ckanext.glasgow.tmp_auth_token_file=/home/okfn/tmp_auth_token.txt
+    ckanext.glasgow.data_collection_api=https://gccctpecdatacollectionservicesint.cloudapp.net/
+    ckanext.glasgow.metadata_api=https://gccctpecmetadataservicesint.cloudapp.net/
+    ckanext.glasgow.identity_api=https://gccctpecidentityservicesINT.cloudapp.net/
+
 
     # OAuth 2.0 WAAD settings
     ckanext.oauth2waad.client_id = ...
-    # Change to relevant server
     ckanext.oauth2waad.redirect_uri = https://localhost:5000/_waad_redirect_uri
     ckanext.oauth2waad.auth_endpoint = https://login.windows.net/common/oauth2/authorize
     ckanext.oauth2waad.auth_token_endpoint = https://login.windows.net/common/oauth2/token
     ckanext.oauth2waad.resource = http://GCCCTPECServicesINT.cloudapp.net:8080/
     ckanext.oauth2waad.csrf_secret = ...
+    ckanext.oauth2waad.servicetoservice.auth_token_endpoint = https://login.windows.net/gccctpecadint.onmicrosoft.com/oauth2/token
+    ckanext.oauth2waad.servicetoservice.client_id = ...
+    ckanext.oauth2waad.servicetoservice.client_secret =
+    ckanext.oauth2waad.servicetoservice.resource = http://GCCCTPECServicesINT.cloudapp.net:60855/ http://GCCCTPECServicesINT.cloudapp.net:8080/ http://GCCCTPECServicesINT.cloudapp.net:8083/
+    ckanext.oauth2waad.servicetoservice.resource_names = metadata data_collection identity
 
     ## Storage Settings
 
