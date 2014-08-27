@@ -5,7 +5,7 @@ import ckan.new_authz as new_authz
 import ckan.plugins.toolkit as toolkit
 import ckan.lib.helpers as helpers
 
-from ckanext.glasgow.logic.action import ECAPINotFound
+from ckanext.glasgow.logic.action import ECAPINotFound, ECAPINotAuthorized
 
 class CreateUsersController(toolkit.BaseController):
     def create_users(self):
@@ -46,6 +46,9 @@ class CreateUsersController(toolkit.BaseController):
                 request = toolkit.get_action('ec_user_create')(context, data_dict)
             except ECAPINotFound, e:
                 helpers.flash_error('Error CTPEC platform returned an error: {}'.format(str(e)))
+                return toolkit.render('create_users/create_users.html', extra_vars=extra_vars)
+            except ECAPINotAuthorized, e:
+                helpers.flash_error('Error CTPEC platform returned an authorization error: {}'.format(str(e)))
                 return toolkit.render('create_users/create_users.html', extra_vars=extra_vars)
             except toolkit.ValidationError, e:
                 helpers.flash_error('Error validating fields {}'.format(str(e)))
