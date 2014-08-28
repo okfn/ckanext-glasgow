@@ -37,6 +37,7 @@ class CreateUsersController(toolkit.BaseController):
                 data_dict['IsRegisteredUser'] = False
 
                 request = toolkit.get_action('ec_user_create')(context, data_dict)
+                extra_vars['data'] = None
             except toolkit.ObjectNotFound:
                 helpers.flash_error('Organization {} not found'.format(
                     organization_id))
