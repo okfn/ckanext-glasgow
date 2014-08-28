@@ -404,6 +404,22 @@ def handle_file_delete(context, audit, harvest_object):
 
     resource_id = audit['CustomProperties'].get('FileId')
     dataset_id = audit['CustomProperties'].get('DataSetId')
+    version_id = audit['CustomProperties'].get('VersionId')
+
+    try:
+        resource_dict = p.toolkit.get_action('resource_show')(context,
+                                                {'id': resource_id})
+
+        if version_id != resource_dict['ec_api_version_id']:
+            # We are not deleting the latest version (the one that has a CKAN
+            # resource) so we don't need to do anything on our side
+            log.debug('Version {0} deleted on the platform'.format(version_id))
+            return True
+
+    except p.toolkit.ObjectNotFound:
+        log.debug('Resource "{0}" does not exist, it can not be deleted'.format(resource_id))
+
+
 
     try:
         p.toolkit.get_action('resource_delete')(context,
