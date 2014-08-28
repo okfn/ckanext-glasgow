@@ -4,11 +4,19 @@ import ckan.model as model
 import ckan.lib.helpers as helpers
 from ckan.controllers.package import PackageController
 
+import ckan.lib.navl.dictization_functions as dict_fns
+from ckan.logic import (
+    clean_dict,
+    tuplize_dict,
+    parse_params,
+)
+
 import ckan.plugins as p
 
 from ckanext.glasgow.logic.action import (
-    ECAPINotAuthorized,
     ECAPIError,
+    ECAPINotAuthorized,
+    ECAPINotFound,
 )
 
 
@@ -155,6 +163,48 @@ class DatasetController(PackageController):
         }
         return p.toolkit.render('package/resource_versions.html',
                                 extra_vars=vars)
+
+    def resource_version_new(self, dataset, resource):
+        extra_vars = {
+            'package_name': dataset,
+            'resource_name': resource,
+            'data': {}
+        }
+        if p.toolkit.request.method == 'POST':
+            save_action = p.toolkit.request.params.get('save')
+            data = clean_dict(dict_fns.unflatten(tuplize_dict(parse_params(p.toolkit.request.POST))))
+            # we don't want to include save as it is part of the form
+            del data['save']
+            del data['id']
+
+            context = {'model': model, 'session': model.Session,
+                       'user': p.toolkit.c.user or p.toolkit.c.author, 'auth_user_obj': p.toolkit.c.userobj}
+
+            dataset_dict = p.toolkit.get_action('package_show')(context, {'id': dataset})
+            data['package_id'] = dataset_dict['id']
+            resource_dict = p.toolkit.get_action('resource_show')(context, {'id': resource})
+            data['resource_id'] = resource_dict['id']
+
+            try:
+                request = p.toolkit.get_action('file_version_request_create')(context, data)
+                helpers.flash_notice('Creation of file version was requested with request id: {}'.format(request['request_id']))
+            except ECAPINotFound, e:
+                helpers.flash_error('Error CTPEC platform returned an error: {}'.format(str(e)))
+            except ECAPINotAuthorized, e:
+                helpers.flash_error('Error CTPEC platform returned an authorization error: {}'.format(str(e)))
+            except ECAPIError, e:
+                helpers.flash_error('Error CTPEC platform returned an error: {}'.format(str(e)))
+                extra_vars['errors'] = e.error_dict
+            except p.toolkit.NotAuthorized, e:
+                helpers.flash_error('you must log in to create file versions')
+                return p.toolkit.abort(401, 'error fetching versions: {0}'.format(str(e)))
+            except p.toolkit.ObjectNotFound, e:
+                helpers.flash_error('Error: {}'.format(str(e)))
+                return p.toolkit.abort(404, 'ObjectNotFound: {0}'.format(str(e)))
+            except p.toolkit.ValidationError, e:
+                helpers.flash_error('Error validating fields {}'.format(str(e)))
+                extra_vars['errors'] = e.error_dict
+        return p.toolkit.render('package/resource_version_new.html', extra_vars)
 
     def resource_version_delete(self, dataset, resource, version=0):
 

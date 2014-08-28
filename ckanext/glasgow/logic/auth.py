@@ -37,6 +37,12 @@ def file_request_create(context, data_dict):
     return dataset_request_create(context, data_dict)
 
 
+def file_version_request_create(context, data_dict):
+
+    # Forward auth check to the dataset level
+    return dataset_request_create(context, data_dict)
+
+
 def file_request_update(context, data_dict):
 
     # Forward auth check to the dataset level

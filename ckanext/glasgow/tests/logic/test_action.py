@@ -1748,3 +1748,107 @@ class TestEcUserCreate(object):
 
         nose.tools.assert_equals('requestid', json.loads(task.value)['request_id'])
         nose.tools.assert_equals('user_request_create', task.task_type)
+
+
+class TestFileVersionCreate(object):
+    def setup(self):
+        # Create test user
+        self.normal_user = helpers.call_action('user_create',
+                                              name='normal_user',
+                                              email='test@test.com',
+                                              password='test')
+
+        # Create test org
+        self.test_org = helpers.call_action('organization_create',
+                                       context={
+                                           'user': 'normal_user',
+                                           'local_action': True,
+                                       },
+                                       name='test_org',
+                                       extras=[{'key': 'ec_api_id',
+                                                'value': 1}])
+
+        context = {'local_action': True, 'user': 'normal_user'}
+        data_dict = {
+            'name': 'test_dataset',
+            'owner_org': 'test_org',
+            'title': 'Test Dataset',
+            'notes': 'Some longer description',
+            'needs_approval': False,
+            'maintainer': 'Test maintainer',
+            'maintainer_email': 'Test maintainer email',
+            'license_id': 'OGL-UK-2.0',
+            'openness_rating': 3,
+            'quality': 5,
+        }
+
+        self.dataset = helpers.call_action('package_create', context=context,
+                                          **data_dict)
+
+        data_dict = {
+            'package_id': self.dataset['id'],
+            'name': 'Test File name',
+            'description': 'Some longer description',
+            'format': 'application/csv',
+            'license_id': 'uk-ogl',
+            'openness_rating': 3,
+            'quality': 5,
+            'standard_name': 'Test standard name',
+            'standard_rating': 1,
+            'standard_version': 'Test standard version',
+            'creation_date': '2014-03-22T05:42:00',
+            'url': 'http://dummy',
+        }
+
+        self.resource = helpers.call_action('resource_create',
+                                           context=context,
+                                           **data_dict)
+
+    def teardown(cls):
+        helpers.reset_db()
+
+    @mock.patch('ckanext.oauth2waad.plugin.service_to_service_access_token')
+    @mock.patch('requests.request')
+    def test_file_version_create(self, mock_request, mock_token):
+        content =  {
+            'RequestId': 'requestid',
+        }
+        mock_request.return_value = mock.Mock(
+            status_code=200,
+            content=json.dumps(content),
+            **{
+                'raise_for_status.side_effect': None,
+                'json.return_value': content,
+            }
+        )
+        mock_token.return_value = 'tmp_auth_token'
+        data_dict = {
+            'package_id': self.dataset['id'],
+            'resource_id': self.resource['id'],
+            'name': 'Test File name',
+            'description': 'Some longer description',
+            'format': 'application/csv',
+            #'license_id': 'uk-ogl',
+            #'openness_rating': 3,
+            #'quality': 5,
+            #'standard_name': 'Test standard name',
+            #'standard_rating': 1,
+            #'standard_version': 'Test standard version',
+            #'creation_date': '2014-03-22T05:42:00',
+            'upload': _get_mock_file_upload(),
+        }
+
+        context = {'user': self.normal_user['name']}
+        request_dict = helpers.call_action('file_version_request_create',
+                                           context=context,
+                                           **data_dict)
+
+        nose.tools.assert_equals('requestid', request_dict['request_id'])
+        nose.tools.assert_equals(
+            ('POST', '/Files/Organisation/{}/Dataset/{}/File/{}'.format(self.test_org['id'], self.dataset['id'], self.resource['id'])), 
+            mock_request.call_args[0]
+        )
+        nose.tools.assert_equals(
+            {'metadata': '{"Metadata": {}, "Type": "application/csv", "Description": "Some longer description", "Title": "Test File name"}'},
+            mock_request.call_args[1]['data']
+        )

@@ -135,6 +135,10 @@ def _get_api_endpoint(operation):
             'POST',
             '/Files/Organisation/{organization_id}/Dataset/{dataset_id}/File/{file_id}',
             write_base),
+        'file_version_request_create': (
+            'POST',
+            '/Files/Organisation/{organization_id}/Dataset/{dataset_id}/File/{file_id}',
+            write_base),
         'file_version_request_update': (
             'PUT',
             '/Files/Organisation/{organization_id}/Dataset/{dataset_id}/File/{file_id}/Version/{version_id}',
@@ -2185,3 +2189,63 @@ def ec_user_create(context, data_dict):
         'request_id': request_id,
     }
 
+
+def file_version_request_create(context, data_dict):
+    check_access('file_version_request_create', context, data_dict)
+    context.update({'model': model, 'session': model.Session})
+    create_schema = custom_schema.resource_schema()
+
+    validated_data_dict, errors = validate(data_dict, create_schema, context)
+
+    if errors:
+        raise p.toolkit.ValidationError(errors)
+
+    dataset = p.toolkit.get_action('package_show')(context,
+        {'id': data_dict['package_id']})
+
+    ec_dict = custom_schema.convert_ckan_resource_to_ec_file(validated_data_dict)
+    ec_dict.pop('DatasetId', None)
+
+    method, url = _get_api_endpoint('file_version_request_create')
+    url = url.format(organization_id=dataset['owner_org'],
+                     dataset_id=dataset['id'],
+                     file_id=data_dict['resource_id'])
+
+
+
+    try:
+        access_token = oauth2.service_to_service_access_token('data_collection')
+    except oauth2.ServiceToServiceAccessTokenError:
+        log.warning('Could not get the Service to Service auth token')
+        access_token = None
+
+    headers = {
+        'Authorization': 'Bearer {0}'.format(access_token),
+    }
+
+    uploaded_file = data_dict.pop('upload', None)
+
+    if isinstance(uploaded_file, cgi.FieldStorage):
+        files = {
+            'file': (uploaded_file.filename,
+                     uploaded_file.file)
+        }
+        data = {
+            'metadata': json.dumps(ec_dict)
+        }
+    else:
+        headers['Content-Type'] = 'application/json'
+        files = None
+
+        # Use ExternalUrl instead of FileExternalUrl
+        ec_dict['ExternalUrl'] = ec_dict.pop('FileExternalUrl', None)
+
+        data = json.dumps(ec_dict)
+
+
+    request = send_request_to_ec_platform(method, url, headers=headers,
+                                          data=data, files=files)
+
+    return {
+        'request_id': request['RequestId'],
+    }

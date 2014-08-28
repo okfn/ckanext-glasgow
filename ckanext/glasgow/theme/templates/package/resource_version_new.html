@@ -1,0 +1,9 @@
+{% extends "package/base_form_page.html" %}
+
+{% block subtitle %}{{ _('Create a new file version') }}{% endblock %}
+
+{% block breadcrumb_content %}
+  <li class="active">{% link_for _('Create a new file version'), controller='ckanext.glasgow.controllers.dataset:DatasetController', action='resource_version_new', dataset=package_name, resource=resource_name %}</li>
+{% endblock %}
+
+{% block form %}{% snippet 'package/snippets/resource_form.html', data=data, errors=errors, error_summary=error_summary, include_metadata=false, pkg_name=pkg_name, stage=stage, allow_upload=g.ofs_impl and logged_in, form_action='new' %}{% endblock %}
