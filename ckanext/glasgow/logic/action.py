@@ -2211,16 +2211,8 @@ def file_version_request_create(context, data_dict):
                      dataset_id=dataset['id'],
                      file_id=data_dict['resource_id'])
 
-
-
-    try:
-        access_token = oauth2.service_to_service_access_token('data_collection')
-    except oauth2.ServiceToServiceAccessTokenError:
-        log.warning('Could not get the Service to Service auth token')
-        access_token = None
-
     headers = {
-        'Authorization': 'Bearer {0}'.format(access_token),
+        'Authorization': _get_api_auth_token()
     }
 
     uploaded_file = data_dict.pop('upload', None)
