@@ -16,15 +16,22 @@
   {% else %}
   {% endif %}
   <li>{% link_for resource_id|truncate(20), controller='package', action='resource_read', id=pkg.id, resource_id=resource_id %}</li>
-  <li {{ self.breadcrumb_content_selected() }}><a href="">Version/{{ versions[version_id].version|string|truncate(30) }}</a></li>
+
+  <li><a href="{% url_for controller='ckanext.glasgow.controllers.dataset:DatasetController', action='resource_versions', dataset=pkg.id, resource=resource_id, version=None %}">Version</a></li>
+
+ <li {{ self.breadcrumb_content_selected() }}><a href="{% url_for controller='ckanext.glasgow.controllers.dataset:DatasetController', action='resource_versions', dataset=pkg.id, resource=resource_id, version=active_version.version %}">{{ active_version.version|string|truncate(20) }}</a></li>
+
 {% endblock %}
 
 {% block primary_content_inner %}
-  {% set res =  versions[version_id] %}
-  {% if res %}
-    Download: <a href="{{ res.url }}">{{res.url}}</a>
+  {% set res =  active_version %}
 
-    <a class="btn btn-danger" href="{% url_for controller='ckanext.glasgow.controllers.dataset:DatasetController', action='resource_version_delete', dataset=pkg.id, resource=resource_id, version=version_id %}" >{{ _('Delete') }}</a>
+  {% if res %}
+    <a class="btn btn-primary" href="{{ res.url }}">Download</a>
+
+    {% if h.check_access('package_update', {'id':pkg.id }) %}
+        <a class="btn btn-danger" href="{% url_for controller='ckanext.glasgow.controllers.dataset:DatasetController', action='resource_version_delete', dataset=pkg.id, resource=resource_id, version=active_version.version %}" >{{ _('Delete') }}</a>
+    {% endif %}
 
     <section class="module">
       <div class="module-content">
@@ -46,10 +53,6 @@
               <td>{{ res.description  }}</td>
             </tr>
             <tr>
-              <th scope="row">{{ _('Last updated') }}</th>
-              <td>{{ h.render_datetime(res.last_modified) or h.render_datetime(res.revision_timestamp) or h.render_datetime(res.created) or _('unknown') }}</td>
-            </tr>
-            <tr>
               <th scope="row">{{ _('Created') }}</th>
               <td>{{ h.render_datetime(res.created) or _('unknown') }}</td>
             </tr>
@@ -59,7 +62,7 @@
             </tr>
             <tr>
               <th scope="row">{{ _('License') }}</th>
-              <td>{% snippet "snippets/license.html", pkg_dict={'license_id': res.license_id}, text_only=True %}</td>
+              <td>{{ res.license_id or '-' }}</td>
             </tr>
             <tr>
               <th scope="row">{{ _('Openness Rating') }}</th>
@@ -72,6 +75,10 @@
            <tr>
               <th scope="row">{{ _('Standard Rating') }}</th>
               <td>{{ res.standard_rating or '-' }}</td>
+           </tr>
+           <tr>
+              <th scope="row">{{ _('Standard Version') }}</th>
+              <td>{{ res.standard_version or '-' }}</td>
            </tr>
            <tr>
               <th scope="row">{{ _('Standard Name') }}</th>
@@ -97,9 +104,9 @@
   <h2 class="module-heading">Resource Versions</h2>
     <ul class="unstyled nav nav-simple">
       {% for version in versions %}
-        <li class="nav-item{{ ' active' if version_id|int == loop.index0 }}">
-          <a class="heading" title="{{ version.creation_date or version.name }}" href="{% url_for controller='ckanext.glasgow.controllers.dataset:DatasetController', action='resource_version', dataset=pkg.id, resource=resource_id,version=loop.index0 %}">
-            {{ version.creation_date or version.name }}
+        <li class="nav-item{{ ' active' if version.version == active_version.version }}">
+          <a class="heading" title="{{ version.name }}" href="{% url_for controller='ckanext.glasgow.controllers.dataset:DatasetController', action='resource_versions', dataset=pkg.id, resource=resource_id,version=version.version %}">
+            {{ version.name }}
           </a>
         </li>
       {% endfor %}

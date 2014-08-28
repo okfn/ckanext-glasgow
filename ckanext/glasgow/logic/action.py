@@ -1035,7 +1035,7 @@ def dataset_request_update(context, data_dict):
     }
 
 
-def resource_version_show(context, data_dict):
+def resource_versions_show(context, data_dict):
     '''Show files versions as listed on EC API'''
     try:
         resource_id = data_dict['resource_id']
@@ -1060,7 +1060,7 @@ def resource_version_show(context, data_dict):
         file_id=resource_id,
     )
 
-    content = send_request_to_ec_platform(method, url)
+    content = send_request_to_ec_platform(method, url, authorize=False)
 
     res_ec_to_ckan = custom_schema.convert_ec_file_to_ckan_resource
     try:
@@ -1454,16 +1454,19 @@ def organization_request_update(context, data_dict):
     }
 
 
-def send_request_to_ec_platform(method, url, data=None, headers=None, **kwargs):
+def send_request_to_ec_platform(method, url, data=None, headers=None,
+                                authorize=True, **kwargs):
 
     task_dict = kwargs.pop('task_dict', None)
     context = kwargs.pop('context', None)
 
     if not headers:
         headers = {
-            'Authorization': _get_api_auth_token(),
             'Content-Type': 'application/json',
         }
+
+    if authorize:
+        headers['Authorization'] = _get_api_auth_token()
 
     try:
         response = requests.request(method, url,

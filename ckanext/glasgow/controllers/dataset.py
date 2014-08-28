@@ -1,7 +1,5 @@
 import json
 
-from pylons import config
-
 import ckan.model as model
 import ckan.lib.helpers as helpers
 from ckan.controllers.package import PackageController
@@ -105,7 +103,7 @@ class DatasetController(PackageController):
             return p.toolkit.render('package/read_api_error.html',
                                     extra_vars=vars)
 
-    def resource_version(self, dataset, resource, version=0):
+    def resource_versions(self, dataset, resource, version=None):
         context = {
             'model': model,
             'session': model.Session,
@@ -124,7 +122,7 @@ class DatasetController(PackageController):
             # we are provided revisions in ascending only by the EC API platform
             # but the requirement is for a descending list, so we are reversing it
             # here
-            resource_versions_show = p.toolkit.get_action('resource_version_show')
+            resource_versions_show = p.toolkit.get_action('resource_versions_show')
             versions = resource_versions_show(context, {
                 'package_id': pkg['id'],
                 'resource_id': resource,
@@ -140,10 +138,21 @@ class DatasetController(PackageController):
         except p.toolkit.ObjectNotFound, e:
             return p.toolkit.abort(404, 'ObjectNotFound: error fetching versions: {0}'.format(str(e)))
 
+        active_version = None
+        if not version:
+            active_version = versions[0]
+        else:
+            for v in versions:
+                if v['version'] == version:
+                    active_version = v
+        if not active_version:
+               return p.toolkit.abort(404, 'File version not found')
+
         vars = {
             'pkg': pkg,
             'resource_id': resource,
-            'version_id': int(version),
+            'version_id': version,
+            'active_version': active_version,
             'versions': versions
         }
         return p.toolkit.render('package/resource_versions.html',
@@ -156,12 +165,15 @@ class DatasetController(PackageController):
         }
         if version:
             data_dict['version_id'] = version
+        try:
+            p.toolkit.get_action('file_request_delete')({}, data_dict)
+        except p.toolkit.NotAuthorized, e:
+            return p.toolkit.abort(401, 'Not authorized to delete a file version')
 
-        p.toolkit.get_action('file_request_delete')({}, data_dict)
 
         helpers.flash_notice('Deletion of File version {0} was requested'.format(version))
 
-        p.toolkit.redirect_to('resource_version')
+        p.toolkit.redirect_to('resource_versions_latest', dataset=dataset, resource=resource, version=None)
 
 
     def dataset_change_requests(self, dataset_name):

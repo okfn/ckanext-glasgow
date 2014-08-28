@@ -35,9 +35,12 @@ class GlasgowSchemaPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     ckan_icon='sitemap'
                     )
 
-        map.connect('resource_version', '/dataset/{dataset}/resource/{resource}/version/{version}',
+        map.connect('resource_versions_latest', '/dataset/{dataset}/resource/{resource}/version',
                     controller=controller,
-                    action='resource_version')
+                    action='resource_versions', version=None)
+        map.connect('resource_versions', '/dataset/{dataset}/resource/{resource}/version/{version}',
+                    controller=controller,
+                    action='resource_versions')
 
         map.connect('/dataset/{dataset}/resource/{resource}/version/{version}/delete',
                     controller=controller,
@@ -139,7 +142,7 @@ class GlasgowSchemaPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             'pending_files_for_dataset',
             'pending_task_for_organization',
             'pending_tasks_for_membership',
-            'resource_version_show',
+            'resource_versions_show',
             'check_for_task_status_update',
             'get_change_request',
             'changelog_show',

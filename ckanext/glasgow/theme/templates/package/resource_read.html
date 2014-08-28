@@ -1,5 +1,16 @@
 {% ckan_extends %}
 
+  {% block resource_actions_inner %}
+    <li>
+      <a class="btn" href="{% url_for controller='ckanext.glasgow.controllers.dataset:DatasetController', action='resource_versions', dataset=pkg.id, resource=res.id, version=None %}">
+        <i class="icon-file"></i>
+        {{ _('Versions') }}
+      </a>
+  </li>
+
+  {{ super() }}
+{% endblock %}
+
   {% block resource_additional_information %}
     {% if res %}
       <section class="module">
