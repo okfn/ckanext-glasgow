@@ -167,6 +167,7 @@ class GlasgowSchemaPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             'dataset_request_update',
             'pending_task_for_dataset',
             'pending_task_for_organization',
+            'organization_create',
             'organization_request_create',
             'task_status_show',
             'get_change_request',
