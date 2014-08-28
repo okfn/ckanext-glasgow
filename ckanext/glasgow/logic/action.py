@@ -155,6 +155,10 @@ def _get_api_endpoint(operation):
             'GET',
             '/Metadata/Organisation/{organization_id}/Dataset/{dataset_id}/File/{file_id}/Versions',
             read_base),
+        'organization_list': (
+            'GET',
+            '/Metadata/Organisation',
+            read_base),
         'organization_show': (
             'GET',
             '/Metadata/Organisation/{organization_id}',
@@ -1775,6 +1779,40 @@ def ec_user_list(context, data_dict):
         params['$top'] = top
     try:
         access_token = oauth2.service_to_service_access_token('identity')
+    except oauth2.ServiceToServiceAccessTokenError:
+        log.warning('Could not get the Service to Service auth token')
+        access_token = None
+
+    headers = {
+        'Authorization': 'Bearer {0}'.format(access_token),
+        'Content-Type': 'application/json',
+    }
+
+    return send_request_to_ec_platform(method, url, headers=headers,
+                                       params=params)
+
+
+@p.toolkit.side_effect_free
+def ec_organization_list(context, data_dict):
+    '''proxy a request to ec platform for user list'''
+    check_access('organization_list',context, data_dict)
+    organization_id = data_dict.get('organization_id')
+    if organization_id:
+        method, url = _get_api_endpoint('organization_list')
+        url = url.format(organization_id=organization_id)
+    else:
+        method, url = _get_api_endpoint('organization_show')
+
+
+    top = data_dict.get('top')
+    skip = data_dict.get('skip')
+    params = {}
+    if top:
+        params['$top'] = top
+    if skip:
+        params['$skip'] = skip
+    try:
+        access_token = oauth2.service_to_service_access_token('metadata')
     except oauth2.ServiceToServiceAccessTokenError:
         log.warning('Could not get the Service to Service auth token')
         access_token = None

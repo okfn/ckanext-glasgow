@@ -138,6 +138,7 @@ class GlasgowSchemaPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             'ec_user_show',
             'ec_user_list',
             'ec_user_create',
+            'ec_organization_list',
             'dataset_request_create',
             'file_request_create',
             'file_request_update',
