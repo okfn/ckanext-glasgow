@@ -8,4 +8,12 @@
     {{ _('Versions') }}
   </a>
 </li>
+{% if h.check_access('file_version_request_create') %}
+<li>
+  <a href="{% url_for controller='ckanext.glasgow.controllers.dataset:DatasetController', action='resource_version_new', dataset=pkg.id, resource=res.id %}">
+    <i class="icon-file"></i>
+    {{ _('Add New Versions') }}
+  </a>
+</li>
+{% endif %}
 {% endblock %}
