@@ -75,7 +75,7 @@ class GlasgowSchemaPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         map.connect('/organization/{organization_id}',
                     controller=org_controller, action='read')
 
-        map.connect('/create_users',
+        map.connect('create_platform_users', '/create_users',
                     controller='ckanext.glasgow.controllers.create_user:CreateUsersController',
                     action='create_users')
         return map

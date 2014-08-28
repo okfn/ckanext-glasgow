@@ -1,5 +1,17 @@
 {% ckan_extends %}
 
+{% block header_account_logged %}
+    {% if h.organizations_available(permission='admin') %}
+    <li>
+        <a href="{{ h.url_for('create_platform_users') }}" title="{{ _('Create platform users') }}">
+        <i class="icon-user"></i>
+        </a>
+    </li>
+    {% endif %}
+
+    {{ super() }}
+{% endblock %}
+
 {% block header_site_navigation_tabs %}
   {% if h.check_access('approvals_list') %}
   {{ h.build_nav_main(
