@@ -38,9 +38,8 @@ class CreateUsersController(toolkit.BaseController):
 
                 request = toolkit.get_action('ec_user_create')(context, data_dict)
                 extra_vars['data'] = None
-            except toolkit.ObjectNotFound:
-                helpers.flash_error('Organization {} not found'.format(
-                    organization_id))
+            except toolkit.ObjectNotFound, e:
+                helpers.flash_error('Object not found {}'.format(str(e)))
             except ECAPINotFound, e:
                 helpers.flash_error('Error CTPEC platform returned an error: {}'.format(str(e)))
             except ECAPINotAuthorized, e:
