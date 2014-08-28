@@ -16,47 +16,41 @@ class CreateUsersController(toolkit.BaseController):
 
         if toolkit.request.method == 'POST':
             params = dict(toolkit.request.params)
+            data = params.copy()
+            data.pop('Password')
+            data.pop('confirm-password')
+            extra_vars['data'] = data
+
             try:
-                if params.get('organisation'):
-                    organisation_id = toolkit.get_action('organization_show')(
-                        context={}, data_dict={'id': params['organisation']})['id']
+                organization_id = params.get('OrganisationId', None)
+
+                if organization_id:
+                    organization_id = toolkit.get_action('organization_show')(
+                        context={}, data_dict={'id': organization_id})['id']
+
+                confirm = params.pop('confirm-password')
+                if confirm != params['Password']:
+                    raise toolkit.ValidationError({'Password': 'passwords do not match'})
+
+                context = {'model': model, 'session': model.Session}
+                data_dict = params.copy()
+                data_dict['IsRegisteredUser'] = False
+
+                request = toolkit.get_action('ec_user_create')(context, data_dict)
             except toolkit.ObjectNotFound:
                 helpers.flash_error('Organization {} not found'.format(
-                    params['organisation']))
-                return toolkit.render('create_users/create_users.html', extra_vars=extra_vars)
-
-            confirm = params.pop('confirm-password')
-            if confirm != params['Password']:
-                helpers.flash_error('passwords do not match')
-                return toolkit.render('create_users/create_users.html', extra_vars=extra_vars)
-
-            context = {'model': model, 'session': model.Session}
-            data_dict = {
-                'UserName': params['Username'],
-                'Password': params['Password'],
-                'IsRegisteredUser': True,
-                'Email': params['Email'],
-                'FirstName': params['First Name'],
-                'LastName': params['Last Name'],
-                'DisplayName': params['Display Name'],
-                'About': params['About'],
-                'OrganisationId': params.get('organisation'),
-            }
-            try:
-                request = toolkit.get_action('ec_user_create')(context, data_dict)
+                    organization_id))
             except ECAPINotFound, e:
                 helpers.flash_error('Error CTPEC platform returned an error: {}'.format(str(e)))
-                return toolkit.render('create_users/create_users.html', extra_vars=extra_vars)
             except ECAPINotAuthorized, e:
                 helpers.flash_error('Error CTPEC platform returned an authorization error: {}'.format(str(e)))
-                return toolkit.render('create_users/create_users.html', extra_vars=extra_vars)
             except toolkit.NotAuthorized, e:
                 helpers.flash_error('Not authorized to add users')
-                return toolkit.render('create_users/create_users.html', extra_vars=extra_vars)
             except toolkit.ValidationError, e:
                 helpers.flash_error('Error validating fields {}'.format(str(e)))
-                return toolkit.render('create_users/create_users.html', extra_vars=extra_vars)
-            helpers.flash_success('A request to create user {} was sent, your request id is {}'.format(params['Username'], request['request_id']))
+                extra_vars['errors'] = e.error_dict
+            else:
+                helpers.flash_success('A request to create user {} was sent, your request id is {}'.format(params['UserName'], request['request_id']))
 
         user = toolkit.c.user
         extra_vars['is_sysadmin'] = new_authz.is_sysadmin(user)

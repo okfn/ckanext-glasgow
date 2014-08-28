@@ -71,7 +71,7 @@ def _get_api_auth_token():
 
     '''
 
-    token = None
+    token = ''
 
     try:
         token = session.get('ckanext-oauth2waad-access-token')
@@ -81,9 +81,9 @@ def _get_api_auth_token():
         pass
 
         # Allow token to be set from an env var. Useful for the tests.
-        token = os.environ.get('__CKANEXT_GLASGOW_AUTH_HEADER', None)
+        token = os.environ.get('__CKANEXT_GLASGOW_AUTH_HEADER', '')
 
-    if not token.startswith('Bearer '):
+    if token and not token.startswith('Bearer '):
         token = 'Bearer ' + token
 
     return token

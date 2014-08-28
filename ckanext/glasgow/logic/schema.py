@@ -287,7 +287,7 @@ def ec_create_user_schema():
     return {
         'UserName': [not_empty, unicode],
         'Password': [not_empty, unicode],
-        'IsRegisteredUser': [not_empty, boolean_validator],
+        'IsRegisteredUser': [ignore_missing, boolean_validator],
         'Email': [not_empty, unicode],
         'FirstName': [not_empty, unicode],
         'LastName': [not_empty, unicode],

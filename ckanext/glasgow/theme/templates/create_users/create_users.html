@@ -17,12 +17,12 @@
         <div class="control-group">
           <label class="control-label" for="organisation">Organisation</label>
           <div class="controls">
-            <select id="organisation" name="organisation">
+            <select id="organisation" name="OrganisationId">
               {% if is_sysadmin %}
-              <option value="" {% if data['organisation'] == '' %}selected{% endif %}>No organisation</option>
+              <option value="" {% if data['OrganisationId'] == '' %}selected{% endif %}>No organisation</option>
               {% endif %}
               {% for organisation in organisation_names %}
-                <option {% if data['organisation'] == organisation %}selected{% endif %}>{{ organisation }}</option>
+                <option {% if data['OrganisationId'] == organisation %}selected{% endif %}>{{ organisation }}</option>
               {% endfor %}
             </select>
             <span class="help-block">If you select an organisation here, the new user will be created as an <em>Editor</em> in that organisation.</span>
@@ -32,21 +32,21 @@
         <div class="control-group">
           <label class="control-label" for="firstname"><span title="This field is required" class="control-required">*</span> First name</label>
           <div class="controls">
-            <input type="text" id="firstname" name="First Name" placeholder="Joe" maxlength="255" value="{{ data['First Name'] }}">
+            <input type="text" id="firstname" name="FirstName" placeholder="Joe" maxlength="255" value="{{ data['FirstName'] }}">
           </div>
         </div>
 
         <div class="control-group">
           <label class="control-label" for="lastname"><span title="This field is required" class="control-required">*</span> Last name</label>
           <div class="controls">
-            <input type="text" id="lastname" name="Last Name" placeholder="Bloggs" maxlength="255" value="{{ data['Last Name'] }}">
+            <input type="text" id="lastname" name="LastName" placeholder="Bloggs" maxlength="255" value="{{ data['LastName'] }}">
           </div>
         </div>
 
         <div class="control-group">
           <label class="control-label" for="username"><span title="This field is required" class="control-required">*</span> Username</label>
           <div class="controls">
-            <input type="text" id="username" name="Username" placeholder="joebloggs" minlength="1" maxlength="16" pattern="([0-9,a-z,A-Z]-?_?)*" value="{{ data['Username'] }}">
+            <input type="text" id="username" name="UserName" placeholder="joebloggs" minlength="1" maxlength="16" pattern="([0-9,a-z,A-Z]-?_?)*" value="{{ data['UserName'] }}">
             <span class="help-block">The username must contain only digits 0-9, letters a-z and A-Z, dash - and undescore _.</span>
           </div>
         </div>
@@ -54,7 +54,7 @@
         <div class="control-group">
           <label class="control-label" for="displayname"><span title="This field is required" class="control-required">*</span> Display name</label>
           <div class="controls">
-            <input type="text" id="displayname" name="Display Name" placeholder="Joe Bloggs" maxlength="255" value="{{ data['Display Name'] }}">
+            <input type="text" id="displayname" name="DisplayName" placeholder="Joe Bloggs" maxlength="255" value="{{ data['DisplayName'] }}">
           </div>
         </div>
 
