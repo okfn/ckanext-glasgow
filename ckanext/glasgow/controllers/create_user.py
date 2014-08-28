@@ -17,7 +17,7 @@ class CreateUsersController(toolkit.BaseController):
         if toolkit.request.method == 'POST':
             params = dict(toolkit.request.params)
             try:
-                if params['organisation']:
+                if params.get('organisation'):
                     organisation_id = toolkit.get_action('organization_show')(
                         context={}, data_dict={'id': params['organisation']})['id']
             except toolkit.ObjectNotFound:
