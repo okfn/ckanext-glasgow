@@ -127,9 +127,7 @@ class DatasetController(PackageController):
                 'package_id': pkg['id'],
                 'resource_id': resource,
             })
-            if versions:
-                versions.reverse()
-            else:
+            if not versions:
                return p.toolkit.abort(404, 'no versions were found for this file')
         except p.toolkit.ValidationError, e:
             return p.toolkit.abort(404, 'error fetching versions: {0}'.format(str(e)))
