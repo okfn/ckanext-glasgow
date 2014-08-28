@@ -1798,11 +1798,10 @@ def ec_organization_list(context, data_dict):
     check_access('organization_list',context, data_dict)
     organization_id = data_dict.get('organization_id')
     if organization_id:
-        method, url = _get_api_endpoint('organization_list')
+        method, url = _get_api_endpoint('organization_show')
         url = url.format(organization_id=organization_id)
     else:
-        method, url = _get_api_endpoint('organization_show')
-
+        method, url = _get_api_endpoint('organization_list')
 
     top = data_dict.get('top')
     skip = data_dict.get('skip')
