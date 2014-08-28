@@ -17,7 +17,7 @@ class CreateUsersController(toolkit.BaseController):
         if toolkit.request.method == 'POST':
             params = dict(toolkit.request.params)
             try:
-                if params['organisation']:
+                if params.get('organisation'):
                     organisation_id = toolkit.get_action('organization_show')(
                         context={}, data_dict={'id': params['organisation']})['id']
             except toolkit.ObjectNotFound:
@@ -49,6 +49,9 @@ class CreateUsersController(toolkit.BaseController):
                 return toolkit.render('create_users/create_users.html', extra_vars=extra_vars)
             except ECAPINotAuthorized, e:
                 helpers.flash_error('Error CTPEC platform returned an authorization error: {}'.format(str(e)))
+                return toolkit.render('create_users/create_users.html', extra_vars=extra_vars)
+            except toolkit.NotAuthorized, e:
+                helpers.flash_error('Not authorized to add users')
                 return toolkit.render('create_users/create_users.html', extra_vars=extra_vars)
             except toolkit.ValidationError, e:
                 helpers.flash_error('Error validating fields {}'.format(str(e)))
