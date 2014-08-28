@@ -83,22 +83,6 @@ def _get_api_auth_token():
         # Allow token to be set from an env var. Useful for the tests.
         token = os.environ.get('__CKANEXT_GLASGOW_AUTH_HEADER', None)
 
-    if not token:
-
-        # From this onwards it is all fake, it's just temporary maintained in
-        # case proper integration with WAAD is not working
-
-        token = 'tmp_auth_token'
-
-        tmp_token_file = config.get('ckanext.glasgow.tmp_auth_token_file')
-        if tmp_token_file:
-            try:
-                with open(tmp_token_file, 'r') as f:
-                    token = f.read().strip('\n')
-            except IOError:
-                log.critical('Temp auth token file not found: {0}'
-                             .format(tmp_token_file))
-
     if not token.startswith('Bearer '):
         token = 'Bearer ' + token
 

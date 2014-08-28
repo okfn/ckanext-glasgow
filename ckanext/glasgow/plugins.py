@@ -34,8 +34,6 @@ class GlasgowSchemaPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     action='read',
                     ckan_icon='sitemap'
                     )
-        map.connect('auth token', '/auth_token', controller=controller,
-                    action='auth_token')
 
         map.connect('resource_version', '/dataset/{dataset}/resource/{resource}/version/{version}',
                     controller=controller,
