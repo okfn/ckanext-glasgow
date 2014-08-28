@@ -50,6 +50,9 @@ class CreateUsersController(toolkit.BaseController):
             except ECAPINotAuthorized, e:
                 helpers.flash_error('Error CTPEC platform returned an authorization error: {}'.format(str(e)))
                 return toolkit.render('create_users/create_users.html', extra_vars=extra_vars)
+            except toolkit.NotAuthorized, e:
+                helpers.flash_error('Not authorized to add users')
+                return toolkit.render('create_users/create_users.html', extra_vars=extra_vars)
             except toolkit.ValidationError, e:
                 helpers.flash_error('Error validating fields {}'.format(str(e)))
                 return toolkit.render('create_users/create_users.html', extra_vars=extra_vars)
