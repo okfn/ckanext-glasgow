@@ -19,6 +19,8 @@ from ckanext.glasgow.logic.action import (
     ECAPINotFound,
 )
 
+import ckanext.glasgow.logic.schema as glasgow_schema
+
 
 class DatasetController(PackageController):
 
@@ -174,7 +176,10 @@ class DatasetController(PackageController):
             context = {'model': model, 'session': model.Session,
                        'user': p.toolkit.c.user or p.toolkit.c.author, 'auth_user_obj': p.toolkit.c.userobj}
 
+            context['schema'] = glasgow_schema.resource_schema()
             data = p.toolkit.get_action('resource_show')(context, {'id': resource})
+            context.pop('schema', None)
+
             extra_vars['data'] = data
         except p.toolkit.ObjectNotFound, e:
             helpers.flash_error('Error: {}'.format(str(e)))
@@ -190,6 +195,8 @@ class DatasetController(PackageController):
             del data['save']
             del data['id']
 
+            context = {'model': model, 'session': model.Session,
+                       'user': p.toolkit.c.user or p.toolkit.c.author, 'auth_user_obj': p.toolkit.c.userobj}
 
             try:
                 dataset_dict = p.toolkit.get_action('package_show')(context, {'id': dataset})
