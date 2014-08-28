@@ -1464,9 +1464,8 @@ def send_request_to_ec_platform(method, url, data=None, headers=None,
         headers = {
             'Content-Type': 'application/json',
         }
-
-    if authorize:
-        headers['Authorization'] = _get_api_auth_token()
+        if authorize:
+            headers['Authorization'] = _get_api_auth_token()
 
     try:
         response = requests.request(method, url,
