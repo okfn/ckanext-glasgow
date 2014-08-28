@@ -168,8 +168,21 @@ class DatasetController(PackageController):
         extra_vars = {
             'package_name': dataset,
             'resource_name': resource,
-            'data': {}
         }
+
+        try:
+            context = {'model': model, 'session': model.Session,
+                       'user': p.toolkit.c.user or p.toolkit.c.author, 'auth_user_obj': p.toolkit.c.userobj}
+
+            data = p.toolkit.get_action('resource_show')(context, {'id': resource})
+            extra_vars['data'] = data
+        except p.toolkit.ObjectNotFound, e:
+            helpers.flash_error('Error: {}'.format(str(e)))
+            return p.toolkit.abort(404, 'ObjectNotFound: {0}'.format(str(e)))
+        except p.toolkit.NotAuthorized, e:
+            helpers.flash_error('you must log in to create file versions')
+            return p.toolkit.abort(401, 'error fetching versions: {0}'.format(str(e)))
+
         if p.toolkit.request.method == 'POST':
             save_action = p.toolkit.request.params.get('save')
             data = clean_dict(dict_fns.unflatten(tuplize_dict(parse_params(p.toolkit.request.POST))))
@@ -177,13 +190,15 @@ class DatasetController(PackageController):
             del data['save']
             del data['id']
 
-            context = {'model': model, 'session': model.Session,
-                       'user': p.toolkit.c.user or p.toolkit.c.author, 'auth_user_obj': p.toolkit.c.userobj}
 
-            dataset_dict = p.toolkit.get_action('package_show')(context, {'id': dataset})
-            data['package_id'] = dataset_dict['id']
-            resource_dict = p.toolkit.get_action('resource_show')(context, {'id': resource})
-            data['resource_id'] = resource_dict['id']
+            try:
+                dataset_dict = p.toolkit.get_action('package_show')(context, {'id': dataset})
+                data['package_id'] = dataset_dict['id']
+                resource_dict = p.toolkit.get_action('resource_show')(context, {'id': resource})
+                data['resource_id'] = resource_dict['id']
+            except p.toolkit.ObjectNotFound, e:
+                helpers.flash_error('Error: {}'.format(str(e)))
+                return p.toolkit.abort(404, 'ObjectNotFound: {0}'.format(str(e)))
 
             try:
                 request = p.toolkit.get_action('file_version_request_create')(context, data)
@@ -204,6 +219,8 @@ class DatasetController(PackageController):
             except p.toolkit.ValidationError, e:
                 helpers.flash_error('Error validating fields {}'.format(str(e)))
                 extra_vars['errors'] = e.error_dict
+
+
         return p.toolkit.render('package/resource_version_new.html', extra_vars)
 
     def resource_version_delete(self, dataset, resource, version=0):
