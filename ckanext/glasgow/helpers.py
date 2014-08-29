@@ -79,7 +79,7 @@ def get_resource_ec_extra_fields(resource_dict):
     resource_schema_keys = custom_resource_schema().keys()
     resource_schema_keys.extend([
         'ec_api_org_id', 'FileName', 'DataSetId', 'can_be_previewed',
-        'on_same_domain', 'clear_upload',
+        'on_same_domain', 'clear_upload', 'dataset_id', 'external_url',
     ])
 
     extra_ec_fields = []
