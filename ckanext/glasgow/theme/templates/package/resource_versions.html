@@ -23,6 +23,17 @@
 
 {% endblock %}
 
+{% block content_action %}
+    {% if h.check_access('file_version_request_create') %}
+      <a  class="btn" href="{% url_for controller='ckanext.glasgow.controllers.dataset:DatasetController', action='resource_version_new', dataset=pkg.id, resource=resource_id %}" style="margin-bottom: 10px">
+
+        <i class="icon-file"></i>
+        {{ _('Add New Version') }}
+      </a>
+    {% endif %}
+
+{% endblock %}
+
 {% block primary_content_inner %}
   {% set res =  active_version %}
 
