@@ -3,6 +3,10 @@
 {% block subtitle %}{{ _('Create a new file version') }}{% endblock %}
 
 {% block breadcrumb_content %}
+    <li>{% link_for _('Datasets'), controller='package', action='search' %}</li>
+    <li>{% link_for package_name|truncate(30), controller='package', action='read', id=package_name %}</li>
+  <li><a href="{% url_for controller='ckanext.glasgow.controllers.dataset:DatasetController', action='resource_versions', dataset=pkg.id, resource=resource_id, version=None %}">Version</a></li>
+
   <li class="active">{% link_for _('Create a new file version'), controller='ckanext.glasgow.controllers.dataset:DatasetController', action='resource_version_new', dataset=package_name, resource=resource_name %}</li>
 {% endblock %}
 

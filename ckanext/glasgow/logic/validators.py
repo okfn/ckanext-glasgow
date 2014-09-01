@@ -39,9 +39,10 @@ def unique_title_within_organization(key, data, errors, context):
             _('Please provide an organization for the dataset')
         )
     # We need to use title_string rather the title otherwise we cannot query
-    # by exact match
+    # by exact match. This syntax to cover most common cases is horrible, but
+    # it saves us from having a custom Solr schema
     search_dict = {
-        'q': 'title_string:"%s"' % value,
+        'q': 'title_string:"%s" OR title_string:"%s" OR title_string:"%s" OR title_string:"%s" OR title_string:"%s"' % (value, value.upper(), value.lower(), value.title(), value.capitalize()),
         'fq': 'owner_org:{0}'.format(org_id),
     }
 
@@ -122,6 +123,23 @@ def no_pending_dataset_with_same_title_in_same_org(key, data, errors, context):
                   'title in the same organization')
             )
     return value
+
+
+def unique_package_name(key, data, errors, context):
+    model = context["model"]
+    session = context["session"]
+    package = context.get("package")
+
+    query = session.query(model.Package.name).filter_by(name=data[key])
+    if package:
+        package_id = package.id
+    else:
+        package_id = data.get(key[:-1] + ("id",))
+    if package_id and package_id is not missing:
+        query = query.filter(model.Package.id != package_id)
+    result = query.first()
+    if result:
+        errors[key].append(_('That URL is already in use.'))
 
 
 def no_pending_organization_with_same_name(value, context):
@@ -353,7 +371,6 @@ def url_name_validator(value, context):
         raise Invalid(_('Name must be a maximum of %i characters long') % \
                       PACKAGE_NAME_MAX_LENGTH)
     if not name_match.match(value):
-        import ipdb; ipdb.set_trace()
         raise Invalid(_('Url must be purely lowercase alphanumeric '
                         '(ascii) characters and these symbols: -_'))
     return value
