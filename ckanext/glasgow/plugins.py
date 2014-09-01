@@ -83,6 +83,9 @@ class GlasgowSchemaPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         map.connect('create_platform_users', '/create_users',
                     controller='ckanext.glasgow.controllers.create_user:CreateUsersController',
                     action='create_users')
+        map.connect('change_user_role', '/change_user_role',
+                    controller='ckanext.glasgow.controllers.create_user:CreateUsersController',
+                    action='change_user_role')
         return map
 
     # IConfigurer

@@ -102,7 +102,21 @@
   </article>
 {% endblock %}
 
-{% block secondary %}
+{% block secondary_content %}
+  <h2 class="module-heading">Platform User Management</h2>
+    <ul class="unstyled nav nav-simple">
+      <li class="nav-item active">
+        <a class="heading" title="change role" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='create_users' %}">
+            Create User
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="heading" title="change role" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='change_user_role' %}">
+            Change User Role
+        </a>
+      </li>
+    </ul>
+  <h2 class="module-heading">Help</h2>
   <aside class="secondary">
     <section class="module module-narrow module-shallow">
       <div class="module-content">

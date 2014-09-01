@@ -1,3 +1,5 @@
+import collections
+
 import pylons
 
 import ckan.model as model
@@ -6,6 +8,16 @@ import ckan.plugins.toolkit as toolkit
 import ckan.lib.helpers as helpers
 
 from ckanext.glasgow.logic.action import ECAPINotFound, ECAPINotAuthorized
+
+
+Option = collections.namedtuple('Option', ['text', 'value'])
+user_roles = [
+    Option('Super Admin', 'SuperAdmin'),
+    Option('Organisation Admin', 'OrganisationAdmin'),
+    Option('Organisation Editor', 'OrganisationEditor'),
+    Option('Unpriviledged User', 'Member'),
+]
+
 
 class CreateUsersController(toolkit.BaseController):
     def create_users(self):
@@ -68,3 +80,50 @@ class CreateUsersController(toolkit.BaseController):
             extra_vars['organisation_names'] = ([o['name'] for o in orgs])
 
         return toolkit.render('create_users/create_users.html', extra_vars=extra_vars)
+
+    def change_user_role(self):
+        context = {'model': model,
+                   'user': toolkit.c.user, 'auth_user_obj': toolkit.c.userobj}
+        try:
+            toolkit.check_access('sysadmin', context, {})
+        except toolkit.NotAuthorized:
+            toolkit.abort(401, toolkit._('Need to be system administrator to make users super admins'))
+        extra_vars = {
+            'errors': {},
+            'roles': user_roles,
+        }
+
+        try:
+            result = toolkit.get_action('ec_user_list')(context, {})
+            users = [ Option(text=i['UserName'], value=['UserId']) for i 
+                      in result ]
+        except (toolkit.ValidationError, KeyError):
+            users =  toolkit.get_action('user_list')(context, {})
+            users = [ Option(text=i['name'], value=i['id']) for i in users ]
+        extra_vars['users'] = users
+        
+        if toolkit.request.method == 'POST':
+            request_params = dict(toolkit.request.params)
+            try:
+                user = toolkit.get_action('user_show')(
+                    context, {'id': request_params['username']})
+
+                ec_user = toolkit.get_action('ec_user_show')(
+                    context, {'ec_username': user['name']})
+
+                organization = ec_user['OrganisationId']
+
+            except toolkit.NotAuthorized:
+                toolkit.abort(401, toolkit._('Not authorized'))
+            except toolkit.ObjectNotFound, e:
+                toolkit.abort(404, 'Object not found: {}'.format(str(e)))
+
+            request_params['current_organization'] = organization
+            request_params['id'] = organization
+            try:
+                request = toolkit.get_action('user_role_update')(context, request_params)
+            except toolkit.ValidationError, e:
+                extra_vars['errors'] = e.error_dict
+                helpers.flash_error('The platform returned an error: {}'.format(e))
+
+        return toolkit.render('create_users/change_role.html', extra_vars=extra_vars)

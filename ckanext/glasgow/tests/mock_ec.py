@@ -581,6 +581,26 @@ def user_list():
                           })
 
 
+@app.route('/Identity/User/<user>')
+def user_show(user):
+    response = {
+            'UserId': 'dcfb1b12-fe52-4d71-9aad-c60fc4c6952c',
+            'UserName': 'johndoe',
+            'OrganisationId': 'de0f2f6e-58ca-4a7b-95b1-7fd6e8df1f69',
+            'Email': 'john.doe@org.com',
+            'FirstName': 'John',
+            'LastName': 'Doe',
+            'DisplayName': 'John Doe',
+            'About': 'Description',
+            'Roles': ['OrganisationEditor'],
+            'IsRegistered': False,
+    }
+        
+    return flask.Response(json.dumps(response),
+                          headers={
+                          'Content-type': 'application/json'
+                          })
+
 def handle_dataset_request(organization_id, dataset_id=None):
     data = flask.request.json
 
