@@ -545,7 +545,10 @@ def handle_user_create(context, audit, harvest_object):
     user_dict = custom_schema.convert_ec_user_to_ckan_user(user)
     user_dict['password'] = str(uuid.uuid4())
 
-    new_user = p.toolkit.get_action('user_create')(context, user_dict)
+    user_context = context.copy()
+    user_context['schema'] = custom_schema.user_schema()
+
+    new_user = p.toolkit.get_action('user_create')(user_context, user_dict)
 
     membership = custom_schema.convert_ec_member_to_ckan_member(user)
     p.toolkit.get_action('organization_member_create')(
@@ -561,7 +564,7 @@ def handle_user_update(context, audit, harvest_object):
     user_context['schema'] = custom_schema.user_update_schema()
     try:
         username = audit['CustomProperties']['UserName']
-    except:
+    except KeyError:
         # UserId is provided instead of UserName when ChangeUserRole
         # command is issued.
         user_id = audit['CustomProperties']['UserId']

@@ -355,7 +355,7 @@ def tag_string_convert(key, data, errors, context):
         data[('tags', num, 'name')] = tag
 
 
-name_match = re.compile('[.@A-Za-z0-9_\-.]*$')
+name_match = re.compile('[.@a-z0-9_\-.]*$')
 def url_name_validator(value, context):
     '''copy of name_validator that allows that @ symbol'''
     if not isinstance(value, basestring):
@@ -372,5 +372,5 @@ def url_name_validator(value, context):
                       PACKAGE_NAME_MAX_LENGTH)
     if not name_match.match(value):
         raise Invalid(_('Url must be purely lowercase alphanumeric '
-                        '(ascii) characters and these symbols: -_'))
+                        '(ascii) characters and these symbols: -_@'))
     return value
