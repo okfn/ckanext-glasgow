@@ -13,22 +13,6 @@
       <h1 class="page-heading">Create users on The Platform</h1>
 
       <form class="form-horizontal" method="post" name="create_user">
-
-        <div class="control-group">
-          <label class="control-label" for="organisation">Organisation</label>
-          <div class="controls">
-            <select id="organisation" name="OrganisationId">
-              {% if is_sysadmin %}
-              <option value="" {% if data['OrganisationId'] == '' %}selected{% endif %}>No organisation</option>
-              {% endif %}
-              {% for organisation in organisation_names %}
-                <option {% if data['OrganisationId'] == organisation %}selected{% endif %}>{{ organisation }}</option>
-              {% endfor %}
-            </select>
-            <span class="help-block">If you select an organisation here, the new user will be created as an <em>Editor</em> in that organisation.</span>
-          </div>
-        </div>
-
         <div class="control-group">
           <label class="control-label" for="firstname"><span title="This field is required" class="control-required">*</span> First name</label>
           <div class="controls">
