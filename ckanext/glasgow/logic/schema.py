@@ -219,10 +219,14 @@ def convert_ckan_member_to_ec_member(ckan_dict):
         'editor': 'OrganisationEditor',
         'member': 'Member',
     }
+    try:
+        role = role_dict.get(ckan_dict['role'])
+    except KeyError:
+        raise p.toolkit.ValidationError('no such role {}'.format(ckan_dict['role']))
 
     return {
         'NewOrganisationId': ckan_dict['id'],
-        'UserRoles': [ role_dict.get(ckan_dict['role']) ],
+        'UserRoles': [ role ],
     }
 
 def convert_ec_member_to_ckan_member(ec_dict):

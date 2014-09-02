@@ -12,6 +12,7 @@ from ckanext.glasgow.logic.action import ECAPINotFound, ECAPINotAuthorized
 
 Option = collections.namedtuple('Option', ['text', 'value'])
 user_roles = [
+    Option('', ''),
     Option('Super Admin', 'SuperAdmin'),
     Option('Organisation Admin', 'OrganisationAdmin'),
     Option('Organisation Editor', 'OrganisationEditor'),
@@ -34,12 +35,6 @@ class CreateUsersController(toolkit.BaseController):
             extra_vars['data'] = data
 
             try:
-                organization_id = params.get('OrganisationId', None)
-
-                if organization_id:
-                    organization_id = toolkit.get_action('organization_show')(
-                        context={}, data_dict={'id': organization_id})['id']
-
                 confirm = params.pop('confirm-password')
                 if confirm != params['Password']:
                     raise toolkit.ValidationError({'Password': 'passwords do not match'})
@@ -50,8 +45,6 @@ class CreateUsersController(toolkit.BaseController):
 
                 request = toolkit.get_action('ec_user_create')(context, data_dict)
                 extra_vars['data'] = None
-            except toolkit.ObjectNotFound, e:
-                helpers.flash_error('Object not found {}'.format(str(e)))
             except ECAPINotFound, e:
                 helpers.flash_error('Error CTPEC platform returned an error: {}'.format(str(e)))
             except ECAPINotAuthorized, e:
@@ -113,17 +106,14 @@ class CreateUsersController(toolkit.BaseController):
 
                 organization = ec_user['OrganisationId']
 
+                request_params['current_organization'] = organization
+                request_params['id'] = organization
+                request = toolkit.get_action('user_role_update')(context, request_params)
             except toolkit.NotAuthorized:
                 toolkit.abort(401, toolkit._('Not authorized'))
             except toolkit.ObjectNotFound, e:
                 toolkit.abort(404, 'Object not found: {}'.format(str(e)))
-
-            request_params['current_organization'] = organization
-            request_params['id'] = organization
-            try:
-                request = toolkit.get_action('user_role_update')(context, request_params)
             except toolkit.ValidationError, e:
                 extra_vars['errors'] = e.error_dict
                 helpers.flash_error('The platform returned an error: {}'.format(e))
-
         return toolkit.render('create_users/change_role.html', extra_vars=extra_vars)
