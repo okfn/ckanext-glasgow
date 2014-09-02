@@ -548,13 +548,16 @@ def handle_user_create(context, audit, harvest_object):
     user_context = context.copy()
     user_context['schema'] = custom_schema.user_schema()
 
-    new_user = p.toolkit.get_action('user_create')(user_context, user_dict)
+    try:
+        new_user = p.toolkit.get_action('user_create')(user_context, user_dict)
 
-    membership = custom_schema.convert_ec_member_to_ckan_member(user)
-    p.toolkit.get_action('organization_member_create')(
-        context, membership)
-    log.debug('Created new user "{}" in org {}'.format(new_user['name'],
-                                                       membership['id']))
+        membership = custom_schema.convert_ec_member_to_ckan_member(user)
+        p.toolkit.get_action('organization_member_create')(
+            context, membership)
+        log.debug('Created new user "{}" in org {}'.format(new_user['name'],
+                                                           membership['id']))
+    except p.toolkit.ValidationError, e:
+        log.debug('Error creating user: {}'.format(str(e)))
 
     return True
 
