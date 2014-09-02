@@ -29,7 +29,7 @@ def create_user(ec_dict):
     if not data_dict.get('fullname'):
         data_dict['fullname'] = data_dict.get('name')
     if data_dict.get('name'):
-        data_dict['name'] = data_dict.get['name'].lower()
+        data_dict['name'] = data_dict['name'].lower()
 
     context = {
         'ignore_auth': True,
