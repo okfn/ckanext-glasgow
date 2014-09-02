@@ -2170,7 +2170,7 @@ def file_request_delete(context, data_dict):
 
 
 def ec_user_create(context, data_dict):
-    check_access('dataset_request_create', context, data_dict)
+    check_access('ec_user_create', context, data_dict)
     context.update({'model': model, 'session': model.Session})
     create_schema = custom_schema.ec_create_user_schema()
 

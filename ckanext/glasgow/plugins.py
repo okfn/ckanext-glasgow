@@ -186,6 +186,7 @@ class GlasgowSchemaPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             'approvals_list',
             'approval_act',
             'approval_download',
+            'ec_user_create',
         )
         return _get_module_functions(custom_auth, function_names)
 

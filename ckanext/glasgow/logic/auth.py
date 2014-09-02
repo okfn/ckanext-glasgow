@@ -109,3 +109,6 @@ def approval_act(context, data_dict):
 
 def approval_download(context, data_dict):
     return approvals_list(context, data_dict)
+
+def ec_user_create(context, data_dict):
+    return approvals_list(context, data_dict)
