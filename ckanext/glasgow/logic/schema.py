@@ -236,7 +236,7 @@ def convert_ec_member_to_ckan_member(ec_dict):
         return {
             'id': ec_dict['OrganisationId'],
             'role':  role_dict[ec_dict['Roles'][0]],
-            'username': ec_dict['UserName'],
+            'username': ec_dict['UserName'].lower(),
         }
 
     except (KeyError, IndexError), e:
@@ -249,6 +249,7 @@ def convert_ec_user_to_ckan_user(ec_dict):
     for ckan_name, ec_name in ckan_to_ec_user_mapping.iteritems():
         if ec_dict.get(ec_name):
             ckan_dict[ckan_name] = ec_dict.get(ec_name)
+    ckan_dict['name'] = ckan_dict['name'].lower()
 
     return ckan_dict
 

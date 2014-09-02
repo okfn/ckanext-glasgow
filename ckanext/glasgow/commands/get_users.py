@@ -28,6 +28,8 @@ def create_user(ec_dict):
         data_dict['email'] = 'noemail'
     if not data_dict.get('fullname'):
         data_dict['fullname'] = data_dict.get('name')
+    if data_dict.get('name'):
+        data_dict['name'] = data_dict.get['name'].lower()
 
     context = {
         'ignore_auth': True,
