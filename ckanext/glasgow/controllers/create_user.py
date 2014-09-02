@@ -88,7 +88,7 @@ class CreateUsersController(toolkit.BaseController):
 
         try:
             result = toolkit.get_action('ec_user_list')(context, {})
-            users = [ Option(text=i['UserName'].lower(), value=['UserId']) for i 
+            users = [ Option(text=i['UserName'].lower(), value=i['UserId']) for i 
                       in result ]
         except (toolkit.ValidationError, KeyError):
             users =  toolkit.get_action('user_list')(context, {})
