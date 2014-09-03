@@ -510,7 +510,7 @@ def handle_organization_create(context, audit, harvest_object):
         # see if the org exists
         current = p.toolkit.get_action('organization_show')(context,
             {'id': org_dict['id']})
-        log.debug('organization "{0}" already exists'.format(current['id']))
+        log.debug('organization "{0}" already exists skipping'.format(current['id']))
     except p.toolkit.ObjectNotFound:
         new_org = p.toolkit.get_action('organization_create')(context,
                                                               org_dict)
@@ -540,7 +540,7 @@ def handle_organization_update(context, audit, harvest_object):
             {'id': org_dict['id']})
         current_org.update(org_dict)
         new_org = p.toolkit.get_action('organization_update')(context,
-                                                              org_dict)
+                                                              current_org)
 
         log.debug('Updated organization "{0}"'.format(new_org['id']))
     except p.toolkit.ObjectNotFound, e:
