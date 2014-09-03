@@ -97,7 +97,7 @@
       <li class="nav-item">
       {% if h.check_access('ec_superadmin_create') %}
         <a class="heading" title="change role" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='change_user_role' %}">
-            Create Super Admin
+            Make User a Super Admin
         </a>
       </li>
       {% endif %}
