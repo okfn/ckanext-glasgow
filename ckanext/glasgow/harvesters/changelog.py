@@ -539,8 +539,9 @@ def handle_organization_update(context, audit, harvest_object):
         current_org = p.toolkit.get_action('organization_show')(context,
             {'id': org_dict['id']})
         current_org.update(org_dict)
+        org_dict['users'] = current_org['users']
         new_org = p.toolkit.get_action('organization_update')(context,
-                                                              current_org)
+                                                              org_dict)
 
         log.debug('Updated organization "{0}"'.format(new_org['id']))
     except p.toolkit.ObjectNotFound, e:
