@@ -90,15 +90,17 @@
   <h2 class="module-heading">Platform User Management</h2>
     <ul class="unstyled nav nav-simple">
       <li class="nav-item active">
-        <a class="heading" title="change role" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='create_users' %}">
+        <a class="heading" title="create users" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='create_users' %}">
             Create User
         </a>
       </li>
       <li class="nav-item">
+      {% if h.check_access('ec_superadmin_create') %}
         <a class="heading" title="change role" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='change_user_role' %}">
-            Change User Role
+            Create Super Admin
         </a>
       </li>
+      {% endif %}
     </ul>
   <h2 class="module-heading">Help</h2>
   <aside class="secondary">

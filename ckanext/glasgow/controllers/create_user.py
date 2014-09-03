@@ -11,13 +11,6 @@ from ckanext.glasgow.logic.action import ECAPINotFound, ECAPINotAuthorized
 
 
 Option = collections.namedtuple('Option', ['text', 'value'])
-user_roles = [
-    Option('', ''),
-    Option('Super Admin', 'SuperAdmin'),
-    Option('Organisation Admin', 'OrganisationAdmin'),
-    Option('Organisation Editor', 'OrganisationEditor'),
-    Option('Unpriviledged User', 'Member'),
-]
 
 
 class CreateUsersController(toolkit.BaseController):
@@ -83,7 +76,6 @@ class CreateUsersController(toolkit.BaseController):
             toolkit.abort(401, toolkit._('Need to be system administrator to make users super admins'))
         extra_vars = {
             'errors': {},
-            'roles': user_roles,
         }
 
         try:
@@ -99,16 +91,14 @@ class CreateUsersController(toolkit.BaseController):
             request_params = dict(toolkit.request.params)
             try:
                 user = toolkit.get_action('user_show')(
-                    context, {'id': request_params['username']})
+                    context, {'id': request_params['user']})
 
                 ec_user = toolkit.get_action('ec_user_show')(
                     context, {'ec_username': user['name']})
+                request_params['id'] = user['id']
 
-                organization = ec_user['OrganisationId']
-
-                request_params['current_organization'] = organization
-                request_params['id'] = organization
-                request = toolkit.get_action('user_role_update')(context, request_params)
+                request = toolkit.get_action('ec_superadmin_create')(context,
+                    request_params)
             except toolkit.NotAuthorized:
                 toolkit.abort(401, toolkit._('Not authorized'))
             except toolkit.ObjectNotFound, e:

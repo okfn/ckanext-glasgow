@@ -234,6 +234,7 @@ def convert_ec_member_to_ckan_member(ec_dict):
         'OrganisationAdmin': 'admin',
         'OrganisationEditor': 'editor',
         'Member': 'member',
+        'SuperAdmin': '',
         'ExternalPortals': '',
         'ExternalService': '',
     }

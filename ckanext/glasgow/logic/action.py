@@ -1640,6 +1640,65 @@ def user_role_update(context, data_dict):
     }
 
 
+def ec_superadmin_create(context, data_dict):
+    check_access('ec_superadmin_create',context, data_dict)
+    context.update({'model': model, 'session': model.Session})
+
+    key = '{0}@{1}'.format(data_dict.get('name', data_dict['user']),
+                           datetime.datetime.now().isoformat())
+
+
+    request_params = {
+        'NewOrganisationId': None,
+        'UserRoles': [ 'SuperAdmin' ],
+    }
+
+    task_dict = _create_task_status(context,
+                                    task_type='user_update',
+                                    entity_id=data_dict['user'],
+                                    entity_type='member',
+                                    key=key,
+                                    value=json.dumps(
+                                        {'data_dict': data_dict})
+                                    )
+
+    user = p.toolkit.get_action('user_show')(
+        context,
+        {'id': data_dict['user'] }
+    )
+
+    method, url = _get_api_endpoint('user_role_update')
+    url = url.format(
+        user_id=user['id']
+    )
+
+    content = send_request_to_ec_platform(method, url,
+                                          data=json.dumps(request_params),
+                                          context=context,
+                                          task_dict=task_dict)
+
+    try:
+        request_id = content['RequestId']
+    except KeyError:
+        error_dict = {
+            'message': ['RequestId not in response from EC Platform'],
+            'content': [json.dumps(content)],
+        }
+        raise p.toolkit.ValidationError(error_dict)
+
+    task_dict = _update_task_status_success(context, task_dict, {
+        'data_dict': data_dict,
+        'request_id': request_id,
+    })
+
+    helpers.flash_success('user update has been requested with request id {0}'.format(request_id))
+
+    return {
+        'task_id': task_dict['id'],
+        'request_id': request_id,
+    }
+
+
 def organization_member_delete(context, data_dict):
     if data_dict.get('__local_action', False):
         context['local_action'] = True

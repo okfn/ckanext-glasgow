@@ -1,18 +1,17 @@
 {% extends "page.html" %}
 {% import 'macros/form.html' as form %}
 
-{% block subtitle %}{{ _('Change User Roles On The Platform') }}{% endblock %}
+{% block subtitle %}{{ _('Make Super Users On The Platform') }}{% endblock %}
 
 {% block breadcrumb_content %}
-  <li class="active">{% link_for _('Change User Roles On The Platform'), controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='change_user_role' %}</li>
+  <li class="active">{% link_for _('Make Super Users On The Platform'), controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='change_user_role' %}</li>
 {% endblock %}
 
 {% block primary_content_inner %}
-<h1 class="page-heading">Change User Roles On The Platform</h1>
+<h1 class="page-heading">Make Super Users On The Platform</h1>
 
 <form method='post'>
-  {{ form.select('username', label=_('User'), options=users, selected=user, error=errors.user) }}
-  {{ form.select('role', label=_('Role'), options=roles, selected=role, error=errors.role) }}
+  {{ form.select('user', label=_('User'), options=users, selected=user, error=errors.user) }}
   <button type="submit" value="search">
     <i class="icon-ok-circle"></i>
     <span>{{ _('Submit') }}</span>
@@ -25,13 +24,13 @@
 <h2 class="module-heading">Platform User Management</h2>
   <ul class="unstyled nav nav-simple">
     <li class="nav-item">
-      <a class="heading" title="change role" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='create_users' %}">
+      <a class="heading" title="create users" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='create_users' %}">
           Create User
       </a>
     </li>
     <li class="nav-item active">
-      <a class="heading" title="change role" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='change_user_role' %}">
-          Change User Role
+      <a class="heading" title="create platform admin" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='change_user_role' %}">
+          Create Super Admin
       </a>
     </li>
   </ul>
