@@ -431,6 +431,8 @@ class TestChangeLogUserUpdate(object):
             user
         )
 
+        membership = helpers.call_action('member_list', id='an_org')
+
     @mock.patch('requests.request')
     def test_make_editor_admin(self, mock_request):
         content = {"UserName": 'testuser',
@@ -469,3 +471,45 @@ class TestChangeLogUserUpdate(object):
 
         membership = helpers.call_action('member_list', id='an_org')
         nt.assert_false(u'userid123' in set(i[0] for i in membership))
+
+class TestOrgUpdate(object):
+    @classmethod
+    def setup_class(cls):
+        # Start mock EC API
+        harvest_model.setup()
+        run_mock_ec()
+
+    def setup(self):
+        helpers.reset_db()
+        self.normal_user = helpers.call_action('user_create',
+                                              name='normal_user',
+                                              email='test@test.com',
+                                              password='test')
+
+
+        self.test_user = helpers.call_action('user_create',
+                                             id='userid123',
+                                             name='testuser',
+                                             email='test1@test.com',
+                                             password='test')
+
+        # Create test org that the user is currently in
+        self.test_org = helpers.call_action('organization_create',
+                                       context={
+                                           'user': 'normal_user',
+                                           'local_action': True,
+                                       },
+                                       name='an_org')
+
+    def test_update_does_not_remove_users(object):
+        site_user = helpers.call_action('get_site_user')
+        handle_organization_update(
+            context={
+                'model': model,
+                'ignore_auth': True,
+                'local_action': True,
+                'user': site_user['name']
+            },
+            audit={'CustomProperties':{'UserId': self.test_user['id']}},
+            harvest_object=None,
+        )

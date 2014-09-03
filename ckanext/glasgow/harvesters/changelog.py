@@ -506,10 +506,16 @@ def handle_organization_create(context, audit, harvest_object):
             name = get_org_name(org_dict, 'title')
         org_dict['name'] = name
 
-    new_org = p.toolkit.get_action('organization_create')(context,
-                                                          org_dict)
+    try:
+        # see if the org exists
+        current = p.toolkit.get_action('organization_show')(context,
+            {'id': org_dict['id']})
+        log.debug('organization "{0}" already exists'.format(current['id']))
+    except p.toolkit.ObjectNotFound:
+        new_org = p.toolkit.get_action('organization_create')(context,
+                                                              org_dict)
 
-    log.debug('Created new organization "{0}"'.format(new_org['id']))
+        log.debug('Created new organization "{0}"'.format(new_org['id']))
 
     return True
 
@@ -529,11 +535,17 @@ def handle_organization_update(context, audit, harvest_object):
             name = get_org_name(org_dict, 'title')
         org_dict['name'] = name
 
-    new_org = p.toolkit.get_action('organization_update')(context,
-                                                          org_dict)
+    try:
+        current_org = p.toolkit.get_action('organization_show')(context,
+            {'id': org_dict['id']})
+        current_org.update(org_dict)
+        new_org = p.toolkit.get_action('organization_update')(context,
+                                                              org_dict)
 
-    log.debug('Updated organization "{0}"'.format(new_org['id']))
-
+        log.debug('Updated organization "{0}"'.format(new_org['id']))
+    except p.toolkit.ObjectNotFound, e:
+        log.debug('failed to update organization "{}": {}'.format(new_org['id'],
+                                                                  str(e)))
     return True
 
 
