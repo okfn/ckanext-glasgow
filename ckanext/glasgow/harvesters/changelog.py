@@ -565,15 +565,7 @@ def handle_user_create(context, audit, harvest_object):
 def handle_user_update(context, audit, harvest_object):
     user_context = context.copy()
     user_context['schema'] = custom_schema.user_update_schema()
-    try:
-        username = audit['CustomProperties']['UserName']
-    except KeyError:
-        # UserId is provided instead of UserName when ChangeUserRole
-        # command is issued.
-        user_id = audit['CustomProperties']['UserId']
-        ckan_user = p.toolkit.get_action('user_show')(
-            user_context, {'id': user_id})
-        username = ckan_user['name']
+    username = audit['CustomProperties']['UserName']
 
     user = p.toolkit.get_action('ec_user_show')(
         context, {'ec_username': username})
@@ -584,25 +576,40 @@ def handle_user_update(context, audit, harvest_object):
         user_dict['fullname'] = user_dict.get('name')
 
     ckan_user = p.toolkit.get_action('user_update')(user_context, user_dict)
+    return True
+
+
+def handle_role_change(context, audit, harvest_object):
+    # UserId is provided instead of UserName when ChangeUserRole
+    # command is issued.
+    user_context = context.copy()
+    user_context['schema'] = custom_schema.user_update_schema()
+    user_id = audit['CustomProperties']['UserId']
+
+    ckan_user = p.toolkit.get_action('user_show')(
+        user_context, {'id': user_id})
+    username = ckan_user['name']
+
+    user = p.toolkit.get_action('ec_user_show')(
+        context, {'ec_username': username})
 
     current_memberships = p.toolkit.get_action('organization_list_for_user')(
         context, {'user': ckan_user['name'], 'permission': 'create_dataset'})
 
-    # remove the user from all orgs
-    for membership in current_memberships:
-        p.toolkit.get_action('organization_member_delete')(context,
-            {'id': membership['id'], 'username': ckan_user['name']})
+    new_membership = custom_schema.convert_ec_member_to_ckan_member(user)
 
-    # add them to the org from ec
-    membership = custom_schema.convert_ec_member_to_ckan_member(user)
+    for membership in current_memberships:
+        # delete any orgs we're not in
+        if membership['id'] != user['OrganisationId']:
+            p.toolkit.get_action('organization_member_delete')(context,
+                {'id': membership['id'], 'username': ckan_user['name']})
+
+    # update our existing membership
     p.toolkit.get_action('organization_member_create')(
-        context, membership)
+        context, new_membership)
 
     log.debug('Updated user "{}" in org {}'.format(ckan_user['name'],
                                                    membership['id']))
-
-    return True
-
 
 def get_audit_command_handler(command):
 
@@ -616,7 +623,7 @@ def get_audit_command_handler(command):
         'UpdateOrganisation': handle_organization_update,
         'CreateUser': handle_user_create,
         'UpdateUser': handle_user_update,
-        'ChangeUserRoles': handle_user_update,
+        'ChangeUserRoles': handle_role_change,
     }
 
     return handlers.get(command)
