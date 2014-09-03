@@ -565,8 +565,9 @@ def handle_user_create(context, audit, harvest_object):
         new_user = p.toolkit.get_action('user_create')(user_context, user_dict)
 
         membership = custom_schema.convert_ec_member_to_ckan_member(user)
-        p.toolkit.get_action('organization_member_create')(
-            context, membership)
+        if membership['id']:
+            p.toolkit.get_action('organization_member_create')(
+                context, membership)
         log.debug('Created new user "{}" in org {}'.format(new_user['name'],
                                                            membership['id']))
     except p.toolkit.ValidationError, e:
