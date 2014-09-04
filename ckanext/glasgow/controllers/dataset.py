@@ -210,6 +210,7 @@ class DatasetController(PackageController):
             try:
                 request = p.toolkit.get_action('file_version_request_create')(context, data)
                 helpers.flash_notice('Creation of file version was requested with request id: {}'.format(request['request_id']))
+                p.toolkit.redirect_to('dataset_read', id=dataset)
             except ECAPINotFound, e:
                 helpers.flash_error('Error CTPEC platform returned an error: {}'.format(str(e)))
             except ECAPINotAuthorized, e:
