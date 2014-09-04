@@ -2330,10 +2330,27 @@ def file_version_request_create(context, data_dict):
 
         data = json.dumps(ec_dict)
 
+    key = '{0}@{1}'.format(validated_data_dict.get('package_id', 'file'),
+                           datetime.datetime.now().isoformat())
+
+    task_dict = _create_task_status(context,
+                                    task_type='file_version_request_update',
+                                    entity_id=validated_data_dict['package_id'],
+                                    entity_type='file',
+                                    key=key,
+                                    value=json.dumps(
+                                        {'data_dict': data_dict})
+                                    )
 
     request = send_request_to_ec_platform(method, url, headers=headers,
                                           data=data, files=files)
 
+    task_dict = _update_task_status_success(context, task_dict, {
+        'data_dict': data_dict,
+        'request_id': request['RequestId'],
+    })
+
     return {
         'request_id': request['RequestId'],
+        'task_id': task_dict['id'],
     }

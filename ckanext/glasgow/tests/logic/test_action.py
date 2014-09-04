@@ -1852,3 +1852,15 @@ class TestFileVersionCreate(object):
             {'metadata': '{"Metadata": {}, "Type": "application/csv", "Description": "Some longer description", "Title": "Test File name"}'},
             mock_request.call_args[1]['data']
         )
+
+        task_dict = helpers.call_action('task_status_show',
+                                        id=request_dict['task_id'])
+        nose.tools.assert_dict_contains_subset(
+            {
+                'task_type': u'file_version_request_update',
+                'entity_type': u'file',
+                'state': u'sent',
+                'error': None
+            },
+            task_dict
+        )
