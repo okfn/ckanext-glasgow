@@ -2,7 +2,7 @@
 
 {% block basic_fields %}
   {{ super() }}
-  {{ form.select('needs_approval', label=_('Datasets require approval'), options=[{'name': 'yes', 'value': true},{'name': 'no', 'value': false}], selected='no', error=errors.needs_approval) }}
+  {{ form.select('needs_approval', label=_('Datasets require approval'), options=[{'value':True}, {'value':False}], selected=c.group_dict.needs_approval, error=errors.needs_approval) }}
 {% endblock %}
 
 {% block dataset_fields %}

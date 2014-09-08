@@ -3,6 +3,7 @@ import logging
 import ckan.plugins as p
 
 from ckanext.harvest.plugin import Harvest
+from ckan.lib.plugins import DefaultOrganizationForm
 
 import ckanext.glasgow.logic.schema as custom_schema
 import ckanext.glasgow.model as custom_model
@@ -252,3 +253,17 @@ class CustomHarvestPlugin(Harvest):
                                unicode]
 
         return schema
+
+
+class GlasgowOrganizationPlugin(p.SingletonPlugin, DefaultOrganizationForm):
+    p.implements(p.IConfigurer, inherit=True)
+    p.implements(p.IGroupForm, inherit=True)
+
+    def group_types(self):
+        return ['organization']
+
+    def form_to_db_schema(self):
+        return custom_schema.update_organization_schema()
+
+    def db_to_form_schema(self):
+        return custom_schema.show_group_schema()

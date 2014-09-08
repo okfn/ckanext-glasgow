@@ -513,7 +513,11 @@ def show_group_schema():
     not_missing = get_validator('not_missing')
     convert_from_extras = get_converter('convert_from_extras')
     schema = default_group_schema()
-    schema.update({'needs_approval': [not_missing, boolean_validator, convert_from_extras]})
+    schema.update({
+        'needs_approval': [convert_from_extras, not_missing, boolean_validator],
+        'num_followers': [ignore_missing],
+        'package_count': [ignore_missing],
+    })
     return schema
 
 
