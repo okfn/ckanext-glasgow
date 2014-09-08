@@ -16,7 +16,7 @@ class RequestStatusController(toolkit.BaseController):
             if not request_status:
                 toolkit.abort(404, toolkit._(
                     'Request {0} not found'.format(request_id)))
-            extra_vars['request_status'] = request_status,
+            extra_vars['request_status'] = request_status
         except ECAPIError, e:
             toolkit.abort(
                 502,
