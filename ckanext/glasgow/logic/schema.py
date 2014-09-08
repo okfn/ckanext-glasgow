@@ -104,6 +104,10 @@ def convert_ckan_organization_to_ec_organization(ckan_dict):
     for ckan_name, ec_name in ckan_to_ec_organization_mapping.iteritems():
         ec_dict[ec_name] = ckan_dict.get(ckan_name)
 
+    # Ask MS
+    if not ec_dict.get('About') and ckan_dict.get('description'):
+        ec_dict['About'] = ckan_dict['description']
+
     return ec_dict
 
 
