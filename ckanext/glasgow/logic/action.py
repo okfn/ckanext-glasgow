@@ -372,6 +372,34 @@ def pending_tasks_for_membership(context, data_dict):
     return task_dicts
 
 
+@p.toolkit.side_effect_free
+def pending_user_tasks(context, data_dict):
+    p.toolkit.check_access('pending_user_tasks', context, data_dict)
+
+    user_id = data_dict.get('id') or data_dict.get('name')
+
+    model = context.get('model')
+    tasks = model.Session.query(model.TaskStatus) \
+        .filter(model.TaskStatus.entity_type == 'user') \
+        .filter(or_(model.TaskStatus.state == 'new',
+                model.TaskStatus.state == 'sent',
+                model.TaskStatus.state == 'error')
+                )
+    if user_id:
+        tasks = tasks.filter(or_(
+                model.TaskStatus.key == id,
+                model.TaskStatus.entity_id == id,
+                ))
+    tasks = tasks.order_by(model.TaskStatus.last_updated.desc())
+
+    results = []
+    for task in tasks:
+        task_dict = model_dictize.task_status_dictize(task, context)
+        task_dict['value'] = json.loads(task_dict['value'])
+        results.append(task_dict)
+    return results
+
+
 def package_create(context, data_dict):
 
     if data_dict.get('__local_action', False):

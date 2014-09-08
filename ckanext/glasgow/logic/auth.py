@@ -83,6 +83,11 @@ def pending_task_for_organization(context, data_dict):
             'msg': 'Only sysadmins can see task statuses'}
 
 
+def pending_user_tasks(context, data_dict):
+    return {'success': False,
+            'msg': 'must be a sysadmin'}
+
+
 def changelog_show(context, data_dict):
     return {'success': False,
             'msg': 'Only sysadmins can see the change log'}

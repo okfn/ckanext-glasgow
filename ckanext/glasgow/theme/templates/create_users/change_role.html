@@ -33,5 +33,10 @@
           Make User a Super Admin
       </a>
     </li>
+    <li class="nav-item">
+      <a class="heading" title="pending users" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='pending_users' %}">
+        Pending Users
+      </a>
+    </li>
   </ul>
 {% endblock %}

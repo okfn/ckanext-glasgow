@@ -107,3 +107,20 @@ class CreateUsersController(toolkit.BaseController):
                 extra_vars['errors'] = e.error_dict
                 helpers.flash_error('The platform returned an error: {}'.format(e))
         return toolkit.render('create_users/change_role.html', extra_vars=extra_vars)
+
+
+    def pending_users(self):
+        context = {'model': model,
+                   'user': toolkit.c.user, 'auth_user_obj': toolkit.c.userobj}
+
+        try:
+            toolkit.check_access('sysadmin', context, {})
+        except toolkit.NotAuthorized:
+            toolkit.abort(401, toolkit._('Need to be system administrator to make users super admins'))
+
+        user_requests = toolkit.get_action('pending_user_tasks')(context, {})
+
+        extra_vars = {
+            'requests': user_requests
+        }
+        return toolkit.render('create_users/pending.html', extra_vars=extra_vars)

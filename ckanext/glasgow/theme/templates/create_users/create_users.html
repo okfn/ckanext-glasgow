@@ -101,7 +101,12 @@
         </a>
       </li>
       {% endif %}
-    </ul>
+      <li class="nav-item">
+        <a class="heading" title="pending users" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='pending_users' %}">
+          Pending Users
+        </a>
+      </li>
+      </ul>
   <h2 class="module-heading">Help</h2>
   <aside class="secondary">
     <section class="module module-narrow module-shallow">

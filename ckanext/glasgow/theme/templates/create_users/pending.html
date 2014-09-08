@@ -1,0 +1,54 @@
+{% extends "page.html" %}
+
+{% block primary_content_inner %}
+  <h1 class="page-heading">Pending Users</h1>
+    <p>Click on the request link for further details of each pending request</p>
+  {% if requests %}
+    <table class="table table-bordered">
+      <thead>
+      <tr>
+        <th>Request ID</th>
+        <th>CKAN Task ID</th>
+        <th>Status</th>
+        <th>EC Message</th>
+      </tr>
+      </thead>
+      <tbody>
+    {% for request in requests %}
+      {% if request.value.request_id %}
+        <td><a href="{%  url_for controller='ckanext.glasgow.controllers.request_status:RequestStatusController', action='get_status', request_id=request.value.request_id %}">{{ request.value.request_id }}</a></td>
+      {% else %}
+        <td></td>
+      {% endif %}
+        <td>{{ request.id }}</td>
+        <td>{{ request.state }}</td>
+        <td>{{ request.value.ec_api_message }}</td>
+      </tr>
+    {% endfor %}
+     </tbody>
+    </table>
+  {% else %}
+    <p>No current pending user requests</p>
+  {% endif %}
+{% endblock %}
+
+{% block secondary_content %}
+<h2 class="module-heading">Platform User Management</h2>
+  <ul class="unstyled nav nav-simple">
+    <li class="nav-item">
+      <a class="heading" title="create users" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='create_users' %}">
+          Create User
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="heading" title="create platform admin" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='change_user_role' %}">
+          Make User a Super Admin
+      </a>
+    </li>
+    <li class="nav-item active">
+      <a class="heading" title="pending users" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='pending_users' %}">
+        Pending Users
+      </a>
+    </li>
+  </ul>
+{% endblock %}
