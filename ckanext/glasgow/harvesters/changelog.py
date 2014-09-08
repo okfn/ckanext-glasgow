@@ -609,21 +609,25 @@ def handle_role_change(context, audit, harvest_object):
 
     current_memberships = p.toolkit.get_action('organization_list_for_user')(
         context, {'user': ckan_user['name'], 'permission': 'create_dataset'})
+    try:
+        new_membership = custom_schema.convert_ec_member_to_ckan_member(user)
 
-    new_membership = custom_schema.convert_ec_member_to_ckan_member(user)
+        for membership in current_memberships:
+            # delete any orgs we're not in
+            if membership['id'] != user['OrganisationId']:
+                p.toolkit.get_action('organization_member_delete')(context,
+                    {'id': membership['id'], 'username': ckan_user['name']})
 
-    for membership in current_memberships:
-        # delete any orgs we're not in
-        if membership['id'] != user['OrganisationId']:
-            p.toolkit.get_action('organization_member_delete')(context,
-                {'id': membership['id'], 'username': ckan_user['name']})
+        # update our existing membership
+        p.toolkit.get_action('organization_member_create')(
+            context, new_membership)
 
-    # update our existing membership
-    p.toolkit.get_action('organization_member_create')(
-        context, new_membership)
+        log.debug('Updated user "{}" in org {}'.format(ckan_user['name'],
+                                                       membership['id']))
+    except p.toolkit.ValidationError, e:
+        log.debug('failed to update user role for "{}": {}'.format(user_id, str(e))
 
-    log.debug('Updated user "{}" in org {}'.format(ckan_user['name'],
-                                                   membership['id']))
+    return True
 
 def get_audit_command_handler(command):
 
