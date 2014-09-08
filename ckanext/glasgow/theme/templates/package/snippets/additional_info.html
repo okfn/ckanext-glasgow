@@ -11,53 +11,53 @@
       {% block package_additional_info %}
       <tr>
         <th scope="row" class="dataset-label">{{ _('Maintainer') }}</th>
-        <td class="dataset-details">{{ pkg_dict.get('maintainer', '-') }}</td>
+        <td class="dataset-details">{{ pkg_dict.maintainer or '-' }}</td>
       </tr>
       <tr>
         <th scope="row" class="dataset-label">{{ _('Maintainer Email') }}</th>
-        <td class="dataset-details">{{ pkg_dict.get('maintainer_email', '-') }}</td>
+        <td class="dataset-details">{{ pkg_dict.maintainer_email or '-' }}</td>
       </tr>
       <tr>
         <th scope="row" class="dataset-label">{{ _('Openness Rating') }}</th>
-        <td class="dataset-details">{{ pkg_dict.get('openness_rating', '-') }}</td>
+        <td class="dataset-details">{{ h.show_int_value(pkg_dict.openness_rating) }}</td>
       </tr>
       <tr>
         <th scope="row" class="dataset-label">{{ _('Quality') }}</th>
-        <td class="dataset-details">{{ pkg_dict.get('quality', '-') }}</td>
+        <td class="dataset-details">{{ h.show_int_value(pkg_dict.quality) }}</td>
      </tr>
      <tr>
         <th scope="row" class="dataset-label">{{ _('Published on behalf of') }}</th>
-        <td class="dataset-details">{{ pkg_dict.get('published_on_behalf_of', '-') }}</td>
+        <td class="dataset-details">{{ pkg_dict.published_on_behalf_of or '-' }}</td>
      </tr>
      <tr>
         <th scope="row" class="dataset-label">{{ _('Usage Guidance') }}</th>
-        <td class="dataset-details">{{ pkg_dict.get('usage_guidance', '-') }}</td>
+        <td class="dataset-details">{{ pkg_dict.usage_guidance or '-' }}</td>
      </tr>
      <tr>
         <th scope="row" class="dataset-label">{{ _('Category') }}</th>
-        <td class="dataset-details">{{ pkg_dict.get('category', '-') }}</td>
+        <td class="dataset-details">{{ pkg_dict.category or '-' }}</td>
      </tr>
      <tr>
         <th scope="row" class="dataset-label">{{ _('Theme') }}</th>
-        <td class="dataset-details">{{ pkg_dict.get('theme', '-') }}</td>
+        <td class="dataset-details">{{ pkg_dict.theme or '-' }}</td>
      </tr>
      <tr>
         <th scope="row" class="dataset-label">{{ _('Standard Rating') }}</th>
-        <td class="dataset-details">{{ pkg_dict.get('standard_rating', '-') }}</td>
+        <td class="dataset-details">{{ h.show_int_value(pkg_dict.standard_rating) }}</td>
      </tr>
      <tr>
         <th scope="row" class="dataset-label">{{ _('Standard Name') }}</th>
-        <td class="dataset-details">{{ pkg_dict.get('standard_name', '-') }}</td>
+        <td class="dataset-details">{{ pkg_dict.standard_name or '-' }}</td>
      </tr>
 
      <tr>
         <th scope="row" class="dataset-label">{{ _('Standard Version') }}</th>
-        <td class="dataset-details">{{ pkg_dict.get('standard_version', '-') }}</td>
+        <td class="dataset-details">{{ pkg_dict.standard_version or '-' }}</td>
      </tr>
 
      <tr>
         <th scope="row" class="dataset-label">{{ _('Needs Approval') }}</th>
-        <td class="dataset-details">{{ pkg_dict.get('needs_approval', '-') }}</td>
+        <td class="dataset-details">{{ pkg_dict.needs_approval or '-' }}</td>
      </tr>
 
       {% endblock %}

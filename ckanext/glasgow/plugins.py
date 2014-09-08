@@ -211,6 +211,7 @@ class GlasgowSchemaPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             'parse_metadata_string',
             'get_resource_ec_extra_fields',
             'get_ec_api_metadata_link',
+            'show_int_value',
         )
         return _get_module_functions(custom_helpers, function_names)
 

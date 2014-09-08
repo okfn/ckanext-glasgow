@@ -34,35 +34,35 @@
               </tr>
               <tr>
                 <th scope="row">{{ _('Format') }}</th>
-                <td>{{ res.get('format', '-') }}</td>
+                <td>{{ res.format or '-' }}</td>
               </tr>
               <tr>
                 <th scope="row">{{ _('License') }}</th>
-                <td>{{ res.get('license_id', '-') }}</td>
+                <td>{{ res.license_id or '-' }}</td>
               </tr>
               <tr>
                 <th scope="row">{{ _('Openness Rating') }}</th>
-                <td>{{ res.get('openness_rating', '-') }}</td>
+                <td>{{ h.show_int_value(res.openness_rating) }}</td>
               </tr>
               <tr>
                 <th scope="row">{{ _('Quality') }}</th>
-                <td>{{ res.get('quality', '-') }}</td>
+                <td>{{ h.show_int_value(res.quality) }}</td>
              </tr>
              <tr>
                 <th scope="row">{{ _('Standard Rating') }}</th>
-                <td>{{ res.get('standard_rating', '-') }}</td>
+                <td>{{ h.show_int_value(res.standard_rating) }}</td>
              </tr>
              <tr>
                 <th scope="row">{{ _('Standard Version') }}</th>
-                <td>{{ res.get('standard_version', '-') }}</td>
+                <td>{{ res.standard_version or '-' }}</td>
              </tr>
              <tr>
                 <th scope="row">{{ _('Standard Name') }}</th>
-                <td>{{ res.get('standard_name', '-') }}</td>
+                <td>{{ res.standard_name or '-' }}</td>
              </tr>
              <tr>
                 <th scope="row">{{ _('Creation Date') }}</th>
-                <td>{{ res.get('creation_date', '-') }}</td>
+                <td>{{ res.creation_date or '-' }}</td>
              </tr>
             </tbody>
           </table>

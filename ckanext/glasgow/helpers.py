@@ -106,3 +106,11 @@ def get_ec_api_metadata_link(object_type, object_dict):
         )
 
     return url
+
+
+def show_int_value(value):
+
+    if value or value == 0:
+        return value
+    else:
+        return '-'
