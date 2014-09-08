@@ -26,43 +26,43 @@
             <tbody>
               <tr>
                 <th scope="row">{{ _('Last updated') }}</th>
-                <td>{{ h.render_datetime(res.last_modified) or h.render_datetime(res.revision_timestamp) or h.render_datetime(res.created) or _('unknown') }}</td>
+                <td>{{ h.render_datetime(res.last_modified) or h.render_datetime(res.revision_timestamp) or h.render_datetime(res.created) or '-' }}</td>
               </tr>
               <tr>
                 <th scope="row">{{ _('Created') }}</th>
-                <td>{{ h.render_datetime(res.created) or _('unknown') }}</td>
+                <td>{{ h.render_datetime(res.created) or '-' }}</td>
               </tr>
               <tr>
                 <th scope="row">{{ _('Format') }}</th>
-                <td>{{ res.mimetype_inner or res.mimetype or res.format or _('unknown') }}</td>
+                <td>{{ res.get('format', '-') }}</td>
               </tr>
               <tr>
                 <th scope="row">{{ _('License') }}</th>
-                <td>{{ res.license_id or '-' }}</td>
+                <td>{{ res.get('license_id', '-') }}</td>
               </tr>
               <tr>
                 <th scope="row">{{ _('Openness Rating') }}</th>
-                <td>{{ res.openness_rating or '-' }}</td>
+                <td>{{ res.get('openness_rating', '-') }}</td>
               </tr>
               <tr>
                 <th scope="row">{{ _('Quality') }}</th>
-                <td>{{ res.quality or '-' }}</td>
+                <td>{{ res.get('quality', '-') }}</td>
              </tr>
              <tr>
                 <th scope="row">{{ _('Standard Rating') }}</th>
-                <td>{{ res.standard_rating or '-' }}</td>
+                <td>{{ res.get('standard_rating', '-') }}</td>
              </tr>
              <tr>
                 <th scope="row">{{ _('Standard Version') }}</th>
-                <td>{{ res.standard_version or '-' }}</td>
+                <td>{{ res.get('standard_version', '-') }}</td>
              </tr>
              <tr>
                 <th scope="row">{{ _('Standard Name') }}</th>
-                <td>{{ res.standard_name or '-' }}</td>
+                <td>{{ res.get('standard_name', '-') }}</td>
              </tr>
              <tr>
                 <th scope="row">{{ _('Creation Date') }}</th>
-                <td>{{ res.creation_date or '-' }}</td>
+                <td>{{ res.get('creation_date', '-') }}</td>
              </tr>
             </tbody>
           </table>
