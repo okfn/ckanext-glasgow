@@ -624,7 +624,7 @@ def handle_role_change(context, audit, harvest_object):
 
         log.debug('Updated user "{}" in org {}'.format(ckan_user['name'],
                                                        membership['id']))
-    except p.toolkit.ValidationError, e:
+    except (p.toolkit.ValidationError, TypeError), e:
         log.debug('failed to update user role for "{}": {}'.format(user_id, str(e)))
 
     return True
