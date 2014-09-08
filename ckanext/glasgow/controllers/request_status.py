@@ -18,7 +18,6 @@ class RequestStatusController(toolkit.BaseController):
                     'Request {0} not found'.format(request_id)))
             extra_vars['request_status'] = request_status,
         except ECAPIError, e:
-            helpers.flash_error('{0}'.format(e.error_dict['message']))
             toolkit.abort(
                 502,
                 'Error fetching request from CTPEC Plaftform {}'.format(str(e))
