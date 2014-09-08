@@ -56,8 +56,10 @@ def get_initial_dataset_name(data_dict, field='title'):
 
 
 def get_org_name(data_dict, field='title'):
-
-    name = slugify.slugify(data_dict[field])
+    data_field = data_dict[field]
+    if isinstance(data_field, str):
+        data_field = unicode(data_field)
+    name = slugify.slugify(data_field)
 
     return name
 

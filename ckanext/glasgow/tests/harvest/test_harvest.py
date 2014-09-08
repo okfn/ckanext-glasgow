@@ -19,6 +19,7 @@ from ckanext.glasgow.harvesters.changelog import (
     handle_user_create,
     handle_user_update,
     handle_role_change,
+    handle_organization_update,
 )
 from ckanext.glasgow.tests import run_mock_ec
 
@@ -501,7 +502,24 @@ class TestOrgUpdate(object):
                                        },
                                        name='an_org')
 
-    def test_update_does_not_remove_users(object):
+    @mock.patch('requests.request')
+    def test_update_does_not_remove_users(self, mock_request):
+        old_members = helpers.call_action('member_list', id=self.test_org['id'])
+        content = { 'MetadataResultSet': [{
+            "Id": self.test_org['id'],
+            "Title": "Glasgow City Council",
+            "CreatedTime": "2014-05-21T06:06:18.353",
+            "ModifiedTime": "2014-05-21T06:06:18.353"
+            }]
+        }
+        mock_request.return_value = mock.Mock(
+            status_code=200,
+            content=json.dumps(content),
+            **{
+                'raise_for_status.return_value': None,
+                'json.return_value': content,
+            }
+        )
         site_user = helpers.call_action('get_site_user')
         handle_organization_update(
             context={
@@ -510,6 +528,38 @@ class TestOrgUpdate(object):
                 'local_action': True,
                 'user': site_user['name']
             },
-            audit={'CustomProperties':{'UserId': self.test_user['id']}},
+            audit={'CustomProperties':{'OrganisationId': self.test_org['id']}},
+            harvest_object=None,
+        )
+
+        members = helpers.call_action('member_list', id=self.test_org['id'])
+        nt.assert_equals(old_members, members)
+
+    @mock.patch('requests.request')
+    def test_update_does_org_that_does_not_exist(self, mock_request):
+        content = { 'MetadataResultSet': [{
+            "Id": 1,
+            "Title": "Glasgow City Council",
+            "CreatedTime": "2014-05-21T06:06:18.353",
+            "ModifiedTime": "2014-05-21T06:06:18.353"
+            }]
+        }
+        mock_request.return_value = mock.Mock(
+            status_code=200,
+            content=json.dumps(content),
+            **{
+                'raise_for_status.return_value': None,
+                'json.return_value': content,
+            }
+        )
+        site_user = helpers.call_action('get_site_user')
+        handle_organization_update(
+            context={
+                'model': model,
+                'ignore_auth': True,
+                'local_action': True,
+                'user': site_user['name']
+            },
+            audit={'CustomProperties':{'OrganisationId': 'does not exist'}},
             harvest_object=None,
         )

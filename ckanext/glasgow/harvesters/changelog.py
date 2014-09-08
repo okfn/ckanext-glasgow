@@ -545,8 +545,8 @@ def handle_organization_update(context, audit, harvest_object):
 
         log.debug('Updated organization "{0}"'.format(new_org['id']))
     except p.toolkit.ObjectNotFound, e:
-        log.debug('failed to update organization "{}": {}'.format(new_org['id'],
-                                                                  str(e)))
+        log.debug('failed to update organization "{}": {}'.format(
+            audit['CustomProperties']['OrganisationId'], str(e)))
     return True
 
 
