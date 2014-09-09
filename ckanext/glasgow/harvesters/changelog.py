@@ -314,13 +314,18 @@ def handle_dataset_update(context, audit, harvest_object):
             json.dumps(audit['CustomProperties']))]
         raise p.toolkit.ObjectNotFound(msg)
 
-    if not dataset_dict.get('name'):
-        name = get_dataset_name_from_id(audit['CustomProperties']['DataSetId'])
-        if not name:
-            msg = ['Dataset not found in CKAN: {0}'.format(
-                audit['CustomProperties']['DataSetId'])]
-            raise p.toolkit.ObjectNotFound(msg)
-        dataset_dict['name'] = name
+    try:
+        existing_dataset = p.toolkit.get_action('package_show')(context,
+                                              {'id': dataset_dict['id']})
+
+        # Any CKAN-specific properties need to be added back here otherwise
+        # they will get lost on the update
+        for key in ['name', 'resources']:
+            dataset_dict[key] = existing_dataset.get(key)
+
+    except p.toolkit.ObjectNotFound, e:
+        msg = ['Dataset not found in CKAN: {0}'.format(dataset_dict['id'])]
+        raise p.toolkit.ObjectNotFound(msg)
 
     updated_dataset = p.toolkit.get_action('package_update')(context,
                                                              dataset_dict)
