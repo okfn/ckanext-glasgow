@@ -75,13 +75,9 @@ class EcInitialHarvester(EcHarvester):
                 'user': self._get_site_user()['name']
             }
             org_name = get_org_name(org, 'Title')
-            data_dict = {
-                'id': org['Id'],
-                'title': org['Title'],
-                'name': org_name,
-                'extras': [
-                ]
-            }
+            data_dict = glasgow_schema.convert_ec_organization_to_ckan_organization(org)
+            data_dict['name'] = org_name
+
             try:
                 if org['Title'] in done:
                     duplicates.append(org['Title'])

@@ -338,19 +338,22 @@ def request_orgs():
             "Id": 1,
             "Title": "Glasgow City Council",
             "CreatedTime": "2014-05-21T06:06:18.353",
-            "ModifiedTime": "2014-05-21T06:06:18.353"
+            "ModifiedTime": "2014-05-21T06:06:18.353",
+            "NeedsApproval": False
             },
         {
             "Id": 2,
             "Title": "Microsoft",
             "CreatedTime": "2014-05-21T00:00:00",
-            "ModifiedTime": "2014-05-21T00:00:00"
+            "ModifiedTime": "2014-05-21T00:00:00",
+            "NeedsApproval": False,
             },
         {
             "Id": 4,
             "Title": "Test Org",
             "CreatedTime": "2014-05-22T00:06:18",
-            "ModifiedTime": "2014-05-22T06:06:18"
+            "ModifiedTime": "2014-05-22T06:06:18",
+            "NeedsApproval": False,
             }
         ]
 
