@@ -355,7 +355,7 @@ def pending_tasks_for_membership(context, data_dict):
 
     model = context.get('model')
     tasks = model.Session.query(model.TaskStatus) \
-        .filter(model.TaskStatus.entity_type == 'organization') \
+        .filter(model.TaskStatus.entity_type == 'member') \
         .filter(or_(model.TaskStatus.state == 'new',
                 model.TaskStatus.state == 'sent')) \
         .filter(or_(model.TaskStatus.entity_id == organization_id,
@@ -1615,7 +1615,7 @@ def user_role_update(context, data_dict):
                            datetime.datetime.now().isoformat())
 
     task_dict = _create_task_status(context,
-                                    task_type='user_update',
+                                    task_type='member_update',
                                     entity_id=data_dict['id'],
                                     entity_type='member',
                                     key=key,
