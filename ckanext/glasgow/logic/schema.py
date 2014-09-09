@@ -512,7 +512,7 @@ def show_group_schema():
     convert_from_extras = get_converter('convert_from_extras')
     schema = default_group_schema()
     schema.update({
-        'needs_approval': [convert_from_extras],
+        'needs_approval': [convert_from_extras, ignore_missing],
         'num_followers': [ignore_missing],
         'package_count': [ignore_missing],
     })
