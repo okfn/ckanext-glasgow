@@ -56,3 +56,58 @@ CKAN Extensions specific to Open Glasgow
     ## Storage Settings
 
     ckan.storage_path = ...
+
+
+## Instance reset protocol
+
+This will reset the CKAN database against the current state of the platform API. All commands are to be run as root.
+
+    # Stop Apache
+    service apache2 stop
+
+    # Stop harvester processes
+    supervisorctl stop all
+
+    # Update source (repeat for ckanext-oauth2waad if necessary)
+    cd /usr/lib/ckan/default/src/ckanext-glasgow
+    git pull
+
+    # Clean DB
+    ckan db clean
+
+    # Clean serch index
+    ckan search-index clean
+
+    # Init DB
+    ckan db init
+
+    # Start harvester processes
+    supervisorctl start all
+
+    # Create harvest sources
+    /usr/lib/ckan/default/src/ckanext-glasgow/bin/create_ckan_harvest_sources
+
+    # Manually add a job for the initial harvester
+    ckan --plugin=ckanext-harvest harvester job {source-id}
+
+    # Force a run of the harvesters to run the previous job
+    ckan --plugin=ckanext-harvest harvester run
+
+    # Once it's finished, create the initial users
+    ckan --plugin=ckanext-glasgow get_initial_users
+
+    # Update the changelog harvester to have a frequency of ALWAYS
+    # TODO: can we script this?
+    https://ckanfrontend.cloudapp.net/harvest/edit/ec-changelog-harvester
+
+    # Update the current audit id for the changelog harvester to the latest one
+    ckan --plugin=ckanext-glasgow changelog_audit set
+
+    # Offline tests
+    ckan dataset list
+    ckan user list
+
+    # Start Apache
+    service apache2 start
+
+    # Online user tests
