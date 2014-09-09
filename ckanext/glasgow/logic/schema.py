@@ -182,8 +182,7 @@ def convert_ckan_resource_to_ec_file(ckan_dict):
     ec_dict = {}
 
     for ckan_name, ec_name in ckan_to_ec_resource_mapping.iteritems():
-        if ckan_dict.get(ckan_name):
-            ec_dict[ec_name] = ckan_dict.get(ckan_name)
+        ec_dict[ec_name] = ckan_dict.get(ckan_name)
 
     if not ec_dict.get('DatasetId') and ckan_dict.get('package_id'):
         ec_dict['DatasetId'] = ckan_dict.get('package_id')
@@ -203,8 +202,7 @@ def convert_ec_file_to_ckan_resource(ec_dict):
     ckan_dict = {}
 
     for ckan_name, ec_name in ckan_to_ec_resource_mapping.iteritems():
-        if ec_dict.get(ec_name):
-            ckan_dict[ckan_name] = ec_dict.get(ec_name)
+        ckan_dict[ckan_name] = ec_dict.get(ec_name)
 
     keys_to_avoid = [v for k, v in ckan_to_ec_resource_mapping.iteritems()]
 
