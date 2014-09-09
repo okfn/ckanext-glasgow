@@ -47,6 +47,8 @@ def get_initial_dataset_name(data_dict, field='title'):
         name=name).first()
 
     if existing_dataset:
+        # TODO: when dataset deletions are implemented we might need to handle
+        # them here
         org_id = data_dict.get('owner_org')
 
         if org_id:
@@ -62,6 +64,16 @@ def get_org_name(data_dict, field='title'):
     name = slugify.slugify(data_field)
 
     return name
+
+
+def get_dataset_name_from_id(dataset_id):
+
+    pkg = model.Package.get(dataset_id)
+
+    if not pkg:
+        return None
+
+    return pkg.name
 
 
 def get_dataset_name_from_task(context, audit_dict):

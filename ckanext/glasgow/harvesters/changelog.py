@@ -19,6 +19,7 @@ from ckanext.glasgow.harvesters import (
     EcHarvester,
     get_dataset_name_from_task,
     get_initial_dataset_name,
+    get_dataset_name_from_id,
     get_task_for_request_id,
     get_org_name,
 )
@@ -314,9 +315,11 @@ def handle_dataset_update(context, audit, harvest_object):
         raise p.toolkit.ObjectNotFound(msg)
 
     if not dataset_dict.get('name'):
-        name = get_dataset_name_from_task(context, audit)
+        name = get_dataset_name_from_id(audit['CustomProperties']['DataSetId'])
         if not name:
-            name = get_initial_dataset_name(dataset_dict)
+            msg = ['Dataset not found in CKAN: {0}'.format(
+                audit['CustomProperties']['DataSetId'])]
+            raise p.toolkit.ObjectNotFound(msg)
         dataset_dict['name'] = name
 
     updated_dataset = p.toolkit.get_action('package_update')(context,
