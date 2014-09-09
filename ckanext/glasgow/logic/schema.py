@@ -507,10 +507,11 @@ def create_group_schema():
 
 
 def show_group_schema():
+    boolean_validator = get_validator('boolean_validator')
     convert_from_extras = get_converter('convert_from_extras')
     schema = default_group_schema()
     schema.update({
-        'needs_approval': [convert_from_extras, ignore_missing],
+        'needs_approval': [convert_from_extras, ignore_missing, boolean_validator],
         'num_followers': [ignore_missing],
         'package_count': [ignore_missing],
     })
