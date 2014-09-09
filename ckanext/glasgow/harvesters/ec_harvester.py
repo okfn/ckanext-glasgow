@@ -69,19 +69,16 @@ class EcInitialHarvester(EcHarvester):
         done = []
         duplicates = []
         for org in ec_api(api_endpoint):
+
             context = {
                 'model': model,
                 'session': model.Session,
                 'user': self._get_site_user()['name']
             }
+            data_dict = glasgow_schema.convert_ec_organization_to_ckan_organization(org)
             org_name = get_org_name(org, 'Title')
-            data_dict = {
-                'id': org['Id'],
-                'title': org['Title'],
-                'name': org_name,
-                'extras': [
-                ]
-            }
+            data_dict['name'] = org_name
+
             try:
                 if org['Title'] in done:
                     duplicates.append(org['Title'])
@@ -95,8 +92,10 @@ class EcInitialHarvester(EcHarvester):
                     context['local_action'] = True
                     toolkit.get_action('organization_create')(context, data_dict)
                     context.pop('local_action', None)
-                except toolkit.ValidationError:
+                except toolkit.ValidationError, e:
+                    log.error('Validation error while creating organization: {0}'.format(str(e.error_dict)))
                     pass
+
         if len(duplicates):
             log.warn('Duplicate Organizations found: {0}'.format(', '.join(duplicates).encode('utf8')))
         return toolkit.get_action('organization_list')(context, {})
@@ -119,7 +118,6 @@ class EcInitialHarvester(EcHarvester):
             .limit(1).first()
         try:
             orgs = self._create_orgs()
-
             api_url = config.get('ckanext.glasgow.metadata_api', '').rstrip('/')
             api_endpoint = api_url + '/Organisations/{0}/Datasets'
 
