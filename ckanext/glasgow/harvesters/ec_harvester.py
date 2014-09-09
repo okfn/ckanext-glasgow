@@ -93,9 +93,7 @@ class EcInitialHarvester(EcHarvester):
                     toolkit.get_action('organization_create')(context, data_dict)
                     context.pop('local_action', None)
                 except toolkit.ValidationError, e:
-                    log.error('Validation error while creating organization: {0}'.format(str(e.error_dict)))
-                    pass
-
+                    log.warn('Error creating org: {0}'.format(str(e)))
         if len(duplicates):
             log.warn('Duplicate Organizations found: {0}'.format(', '.join(duplicates).encode('utf8')))
         return toolkit.get_action('organization_list')(context, {})
