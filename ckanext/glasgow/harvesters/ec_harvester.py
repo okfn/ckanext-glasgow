@@ -69,13 +69,14 @@ class EcInitialHarvester(EcHarvester):
         done = []
         duplicates = []
         for org in ec_api(api_endpoint):
+
             context = {
                 'model': model,
                 'session': model.Session,
                 'user': self._get_site_user()['name']
             }
-            org_name = get_org_name(org, 'Title')
             data_dict = glasgow_schema.convert_ec_organization_to_ckan_organization(org)
+            org_name = get_org_name(org, 'Title')
             data_dict['name'] = org_name
 
             try:
@@ -115,7 +116,6 @@ class EcInitialHarvester(EcHarvester):
             .limit(1).first()
         try:
             orgs = self._create_orgs()
-
             api_url = config.get('ckanext.glasgow.metadata_api', '').rstrip('/')
             api_endpoint = api_url + '/Organisations/{0}/Datasets'
 
