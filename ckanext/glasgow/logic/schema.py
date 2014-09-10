@@ -516,6 +516,9 @@ def show_group_schema():
         'package_count': [ignore_missing],
         'display_name': [ignore_missing]
     })
+    schema['packages'].update({
+        'notes': [ignore_missing],
+    })
     return schema
 
 
