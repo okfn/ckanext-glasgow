@@ -74,6 +74,8 @@ class GlasgowSchemaPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         org_controller = 'ckanext.glasgow.controllers.organization:OrgController'
         map.connect('/organization/new',
                     controller=org_controller, action='new')
+        map.connect('/organization/member_delete/{id}',
+                    controller=org_controller, action='member_delete')
         map.connect('organization_pending_members', '/organization/pending_members/{organization_id}',
                     controller=org_controller, action='pending_member_requests_list')
         map.connect('organization_change_requests', '/organization/change_requests/{organization_name}',
