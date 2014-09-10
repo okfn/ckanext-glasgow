@@ -2272,9 +2272,7 @@ def ec_user_create(context, data_dict):
                                     entity_type='user',
                                     # This will be used for validating datasets
                                     key=validated_data_dict['UserName'],
-                                    value=json.dumps(
-                                        {'data_dict': data_dict})
-                                    )
+                                    value={})
 
     organization_id = validated_data_dict.pop('OrganisationId', None)
     if organization_id:

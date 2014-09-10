@@ -2,27 +2,30 @@
 
 {% block primary_content_inner %}
   <h1 class="page-heading">Pending Users</h1>
-    <p>Click on the request link for further details of each pending request</p>
+    <p>Click update to check details and update a pending request</p>
   {% if requests %}
     <table class="table table-bordered">
       <thead>
       <tr>
+        <th>Requested User</th>
+        <th>Last Checked Status</th>
+        <th>Last Updated</th>
         <th>Request ID</th>
-        <th>CKAN Task ID</th>
-        <th>Status</th>
-        <th>EC Message</th>
+        <th>Check for Update</th>
       </tr>
       </thead>
       <tbody>
     {% for request in requests %}
+        <td>{{request.key}}</td>
+        <td>{{ request.state }}</td>
+        <td>{{ request.last_updated }}</td>
       {% if request.value.request_id %}
-        <td><a href="{%  url_for controller='ckanext.glasgow.controllers.request_status:RequestStatusController', action='get_status', request_id=request.value.request_id %}">{{ request.value.request_id }}</a></td>
+        <td>{{ request.value.request_id}}</td>
+        <td><a class=btn href="{%  url_for controller='ckanext.glasgow.controllers.request_status:RequestStatusController', action='get_status', request_id=request.value.request_id %}"><i class=icon-refresh></i></a></td>
       {% else %}
         <td></td>
+        <td></td>
       {% endif %}
-        <td>{{ request.id }}</td>
-        <td>{{ request.state }}</td>
-        <td>{{ request.value.ec_api_message }}</td>
       </tr>
     {% endfor %}
      </tbody>
