@@ -28,6 +28,7 @@ from ckanext.glasgow.logic.validators import (
     tag_length_validator,
     url_name_validator,
     unique_package_name,
+    extra_key_not_in_resource_root_schema,
 )
 
 
@@ -440,7 +441,7 @@ def custom_resource_extras_schema():
 
     schema = default_extras_schema()
 
-    schema['key'] = [not_empty, string_max_length(255), unicode]
+    schema['key'] = [not_empty, string_max_length(255), extra_key_not_in_resource_root_schema, unicode]
     schema['value'] = [not_missing, string_max_length(64000)]
 
     return schema
