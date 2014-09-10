@@ -1428,7 +1428,7 @@ def organization_update(context, data_dict):
 
 
 def organization_request_update(context, data_dict):
-    check_access('dataset_request_update', context, data_dict)
+    check_access('organization_update', context, data_dict)
     context.update({'model': model, 'session': model.Session})
     update_schema = custom_schema.update_organization_schema()
 
