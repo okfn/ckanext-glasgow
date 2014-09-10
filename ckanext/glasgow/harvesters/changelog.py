@@ -563,6 +563,11 @@ def handle_user_create(context, audit, harvest_object):
 
     user = p.toolkit.get_action('ec_user_show')(
         context, {'ec_username': username})
+
+    if user.get('IsRegistered'):
+        log.debug('Skipping creation of registered user: {}'.format(str(username)))
+        return True
+
     user_dict = custom_schema.convert_ec_user_to_ckan_user(user)
     user_dict['password'] = str(uuid.uuid4())
 

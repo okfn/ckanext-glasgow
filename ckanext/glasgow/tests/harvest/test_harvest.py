@@ -12,6 +12,7 @@ import ckan.new_tests.factories as factories
 
 import ckanext.harvest.model as harvest_model
 from ckanext.harvest.tests.factories import HarvestJobFactory
+from ckan.plugins import toolkit
 
 from ckanext.glasgow.harvesters.ec_harvester import (
     EcInitialHarvester, EcApiException)
@@ -277,6 +278,7 @@ class TestUserCreate(object):
                                            'local_action': True,
                                        },
                                        name='test_org',
+                                       needs_approval=False,
                                        id='organisation123')
 
     @classmethod
@@ -332,6 +334,47 @@ class TestUserCreate(object):
             user
         )
         nt.assert_equals(membership[1], (u'userid123', u'user', u'Editor'))
+
+
+    @mock.patch('requests.request')
+    def test_registered_users_does_not_create_user(self, mock_request):
+        content = {"UserName": 'testuser',
+            "About": "about",
+            "DisplayName": "display name",
+            "Roles": ['OrganisationEditor'],
+            "FirstName": "firstname",
+            "LastName": "lastname",
+            "UserId": "userid123",
+            "IsRegistered": True,
+            "OrganisationId": 'organisation123',
+            "Email": "em@il.com"
+        }
+        mock_request.return_value = mock.Mock(
+            status_code=200,
+            content=json.dumps(content),
+            **{
+                'raise_for_status.return_value': None,
+                'json.return_value': content,
+            }
+        )
+        site_user = helpers.call_action('get_site_user')
+        handle_user_create(
+            context={
+                'model': model,
+                'ignore_auth': True,
+                'local_action': True,
+                'user': site_user['name']
+            },
+            audit={'CustomProperties':{'UserName':'testuser'}},
+            harvest_object=None,
+        )
+
+        nt.assert_raises(
+            toolkit.ObjectNotFound,
+            helpers.call_action,
+            'user_show',
+            id='testuser'
+        )
 
 
 class TestChangeLogUserUpdate(object):
