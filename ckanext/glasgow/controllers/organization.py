@@ -110,3 +110,14 @@ class OrgController(OrganizationController):
                                 extra_vars={'organization': org,
                                             'tasks': tasks,
                                             })
+
+    def member_delete(self, id):
+        try:
+            return super(OrgController, self).member_delete(id)
+        except (ECAPIError, p.toolkit.ValidationError), e:
+            helpers.flash_error('Error removing member: {}'.format(str(e)))
+            p.toolkit.redirect_to(
+                controller='organization',
+                action='members',
+                id=id,
+            )
