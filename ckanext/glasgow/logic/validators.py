@@ -374,3 +374,10 @@ def url_name_validator(value, context):
         raise Invalid(_('Url must be purely lowercase alphanumeric '
                         '(ascii) characters and these symbols: -_@'))
     return value
+
+
+def extra_key_not_in_resource_root_schema(key, data, errors, context):
+
+    for schema_key in context.get('schema_keys', []):
+        if schema_key == data[key]:
+            raise Invalid(_('There is a schema field with the same name'))

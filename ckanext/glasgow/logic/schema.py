@@ -28,6 +28,7 @@ from ckanext.glasgow.logic.validators import (
     tag_length_validator,
     url_name_validator,
     unique_package_name,
+    extra_key_not_in_resource_root_schema,
 )
 
 
@@ -165,9 +166,17 @@ def convert_ec_dataset_to_ckan_dataset(ec_dict):
         ckan_dict['id'] = unicode(ckan_dict['id'])
 
     # Arbitrary stuff stored as extras
-    keys_to_avoid = [v for k, v in ckan_to_ec_dataset_mapping.iteritems()]
 
+    keys_to_avoid = []
+
+    # Platform keys
+    keys_to_avoid.extend([v for k, v in ckan_to_ec_dataset_mapping.iteritems()])
+
+    # Other platform keys not in the mapping
     keys_to_avoid.extend(['CreatedBy'])
+
+    # CKAN keys
+    keys_to_avoid.extend(create_package_schema().keys())
 
     ckan_dict['extras'] = []
     for key, value in ec_dict.iteritems():
@@ -204,9 +213,16 @@ def convert_ec_file_to_ckan_resource(ec_dict):
     for ckan_name, ec_name in ckan_to_ec_resource_mapping.iteritems():
         ckan_dict[ckan_name] = ec_dict.get(ec_name)
 
-    keys_to_avoid = [v for k, v in ckan_to_ec_resource_mapping.iteritems()]
+    keys_to_avoid = []
 
+    # Platform keys
+    keys_to_avoid.extend([v for k, v in ckan_to_ec_resource_mapping.iteritems()])
+
+    # Other platform keys not in the mapping
     keys_to_avoid.extend(['CreatedBy'])
+
+    # CKAN keys
+    keys_to_avoid.extend(resource_schema().keys())
 
     for key, value in ec_dict.iteritems():
         if key not in keys_to_avoid:
@@ -440,7 +456,7 @@ def custom_resource_extras_schema():
 
     schema = default_extras_schema()
 
-    schema['key'] = [not_empty, string_max_length(255), unicode]
+    schema['key'] = [not_empty, string_max_length(255), extra_key_not_in_resource_root_schema, unicode]
     schema['value'] = [not_missing, string_max_length(64000)]
 
     return schema
