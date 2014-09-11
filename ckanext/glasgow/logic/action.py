@@ -329,6 +329,7 @@ def pending_task_for_organization(context, data_dict):
     p.toolkit.check_access('pending_task_for_organization', context, data_dict)
 
     organization_id = data_dict.get('organization_id')
+    p.toolkit.check_access('organization_update', context, {'id': organization_id})
     name = data_dict.get('name')
 
     model = context.get('model')
@@ -351,6 +352,7 @@ def pending_tasks_for_membership(context, data_dict):
     p.toolkit.check_access('pending_task_for_organization', context, data_dict)
 
     organization_id = data_dict.get('organization_id')
+    p.toolkit.check_access('organization_update', context, {'id': organization_id})
     name = data_dict.get('name')
 
     model = context.get('model')

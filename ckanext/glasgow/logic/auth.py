@@ -77,7 +77,7 @@ def pending_task_for_dataset(context, data_dict):
 
 
 def pending_task_for_organization(context, data_dict):
-    return auth_core.update.organization_update(context, data_dict)
+    return approvals_list(context, data_dict)
 
 
 def pending_user_tasks(context, data_dict):
