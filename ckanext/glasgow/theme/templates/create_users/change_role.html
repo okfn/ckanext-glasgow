@@ -28,15 +28,17 @@
           Create User
       </a>
     </li>
-    <li class="nav-item active">
-      <a class="heading" title="create platform admin" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='change_user_role' %}">
-          Make User a Super Admin
-      </a>
-    </li>
     <li class="nav-item">
       <a class="heading" title="pending users" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='pending_users' %}">
         Pending Users
       </a>
     </li>
+      {% if h.check_access('ec_superadmin_create') %}
+    <li class="nav-item active">
+      <a class="heading" title="create platform admin" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='change_user_role' %}">
+          Make User a Super Admin
+      </a>
+    </li>
+      {% endif %}
   </ul>
 {% endblock %}

@@ -95,17 +95,17 @@
         </a>
       </li>
       <li class="nav-item">
+        <a class="heading" title="pending users" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='pending_users' %}">
+          Pending Users
+        </a>
+      </li>
+      <li class="nav-item">
       {% if h.check_access('ec_superadmin_create') %}
         <a class="heading" title="change role" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='change_user_role' %}">
             Make User a Super Admin
         </a>
       </li>
       {% endif %}
-      <li class="nav-item">
-        <a class="heading" title="pending users" href="{% url_for controller='ckanext.glasgow.controllers.create_user:CreateUsersController', action='pending_users' %}">
-          Pending Users
-        </a>
-      </li>
       </ul>
   <h2 class="module-heading">Help</h2>
   <aside class="secondary">

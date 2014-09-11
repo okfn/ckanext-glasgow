@@ -69,23 +69,19 @@ def get_change_request(context, data_dict):
 
 
 def task_status_show(context, data_dict):
-    return {'success': False,
-            'msg': 'Only sysadmins can see task statuses'}
+    return approvals_list(context, data_dict)
 
 
 def pending_task_for_dataset(context, data_dict):
-    return {'success': False,
-            'msg': 'Only sysadmins can see task statuses'}
+    return auth_core.update.package_update(context, data_dict)
 
 
 def pending_task_for_organization(context, data_dict):
-    return {'success': False,
-            'msg': 'Only sysadmins can see task statuses'}
+    return auth_core.update.organization_update(context, data_dict)
 
 
 def pending_user_tasks(context, data_dict):
-    return {'success': False,
-            'msg': 'must be a sysadmin'}
+    return approvals_list(context, data_dict)
 
 
 def changelog_show(context, data_dict):

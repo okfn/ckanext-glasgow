@@ -112,11 +112,10 @@ class CreateUsersController(toolkit.BaseController):
     def pending_users(self):
         context = {'model': model,
                    'user': toolkit.c.user, 'auth_user_obj': toolkit.c.userobj}
-
         try:
-            toolkit.check_access('sysadmin', context, {})
+            toolkit.check_access('ec_user_create', context, {})
         except toolkit.NotAuthorized:
-            toolkit.abort(401, toolkit._('Need to be system administrator to make users super admins'))
+            toolkit.abort(401, toolkit._('Need to be organization administrator to see pending users'))
 
         user_requests = toolkit.get_action('pending_user_tasks')(context, {})
 
