@@ -1,5 +1,7 @@
 import json
 
+import paste
+
 import ckan.model as model
 import ckan.lib.helpers as helpers
 from ckan.controllers.package import PackageController
@@ -322,6 +324,20 @@ class DatasetController(PackageController):
             helpers.flash_error('The EC API returned and error: {0}'.format(str(e)))
 
             p.toolkit.redirect_to('approvals_list')
+        except p.toolkit.NotAuthorized:
+
+            return p.toolkit.abort(403, p.toolkit._('Not authorized to download this file'))
+
         else:
-            p.toolkit.response.headers = download['headers']
-            return download['content']
+            headers = []
+            for k, v in download['headers'].iteritems():
+                if k.lower() not in ('transfer-encoding', 'content-encoding'):
+                    headers.append((k, v))
+
+            app = paste.fileapp.DataApp(download['content'], headers=headers)
+
+            status, headers2, app_iter = p.toolkit.request.call_application(app)
+
+            p.toolkit.response.headers.update(headers2)
+
+            return app_iter
