@@ -184,7 +184,7 @@ def _get_latest_organization_version(audit):
         organization_id=audit['CustomProperties'].get('OrganisationId'),
     )
 
-    response = requests.request(method, url, verify=False)
+    response = requests.request(method, url)
 
     if response.status_code != 200:
         return False
@@ -211,7 +211,7 @@ def _get_latest_dataset_version(audit):
         dataset_id=audit['CustomProperties'].get('DataSetId'),
     )
 
-    response = requests.request(method, url, verify=False)
+    response = requests.request(method, url)
 
     if response.status_code != 200:
         return False
@@ -247,7 +247,7 @@ def _get_file_version(audit):
         version_id=audit['CustomProperties'].get('VersionId'),
     )
 
-    response = requests.request(method, url, verify=False)
+    response = requests.request(method, url)
 
     if response.status_code != 200:
         return False

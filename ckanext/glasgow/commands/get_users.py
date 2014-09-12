@@ -79,7 +79,7 @@ def create_orgs(organization_id, site_user):
     api_url = config.get('ckanext.glasgow.metadata_api', '').rstrip('/')
     api_endpoint = '{}/Metadata/Organisation/{}'.format(api_url, organization_id)
 
-    request = requests.get(api_endpoint, verify=False)
+    request = requests.get(api_endpoint)
     try:
         result = _fetch_from_ec(request)
         org = result['MetadataResultSet'][0]
