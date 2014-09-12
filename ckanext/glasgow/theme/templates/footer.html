@@ -1,0 +1,9 @@
+{% ckan_extends %}
+
+{% block footer_links_ckan %}
+  {% set api_url = 'http://docs.ckan.org/en/{0}/api.html'.format(g.ckan_doc_version) %}
+  <li><a href="{{ api_url }}">{{ _('CKAN API') }}</a></li>
+  <li><a href="http://www.okfn.org/">{{ _('Open Knowledge') }}</a></li>
+  <li><a href="http://www.opendefinition.org/okd/"><img src="/images/od_80x15_blue.png"></a></li>
+{% endblock %}
+

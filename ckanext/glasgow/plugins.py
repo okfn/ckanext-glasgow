@@ -101,6 +101,9 @@ class GlasgowSchemaPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         # Check that we are running the correct CKAN version
         p.toolkit.requires_ckan_version('2.2')
 
+        # Register the public folder
+        p.toolkit.add_public_directory(config, 'theme/public')
+
         # Register the extension template dir
         p.toolkit.add_template_directory(config, 'theme/templates')
 
