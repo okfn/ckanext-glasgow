@@ -261,6 +261,7 @@ class DatasetController(PackageController):
         except p.toolkit.ObjectNotFound:
             return p.toolkit.abort(404, p.toolkit._('Package not found'))
 
+        request_status = None
         try:
             task = p.toolkit.get_action('pending_task_for_dataset')(context,
                 {'name': dataset_name, 'id': pkg['id']})
@@ -268,8 +269,6 @@ class DatasetController(PackageController):
                 task['value'] = json.loads(task['value'])
                 request_status = p.toolkit.get_action('get_change_request')(context,
                     {'id': task['value'].get('request_id')})
-            else:
-                request_status = None
         except p.toolkit.ValidationError, e:
             helpers.flash_error('{0}'.format(e.error_dict['message']))
         except ECAPIError:
