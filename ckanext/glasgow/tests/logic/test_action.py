@@ -1446,7 +1446,6 @@ class TestUserRoleUpdate(object):
             'PUT',
             '/UserRoles/Organisation/{}/User/{}'.format(self.test_org['id'],
                                                         self.normal_user['id']),
-            verify=False,
             data='{{"NewOrganisationId": "{}", "UserRoles": ["OrganisationAdmin"]}}'.format(self.test_org['id']),
             timeout=50,
             headers={
@@ -1501,7 +1500,6 @@ class TestUserRoleUpdate(object):
         mock_request.assert_called_with(
             'PUT',
             '/UserRoles/User/{}'.format(self.normal_user['id']),
-            verify=False,
             data='{{"NewOrganisationId": "{}", "UserRoles": ["OrganisationAdmin"]}}'.format(self.test_org['id']),
             timeout=50,
             headers={
@@ -1700,7 +1698,6 @@ class TestEcUserCreate(object):
         mock_request.assert_called_with(
             'POST',
             '/Users',
-            verify=False,
             data='{"UserName": "testuser", "Last-Name": "last", "IsRegisteredUser": true, "Display-Name": "display name", "Password": "pass", "First-Name": "first", "Email": "em@il"}',
             timeout=50,
             headers={

@@ -1,5 +1,7 @@
 import json
 
+import paste
+
 import ckan.model as model
 import ckan.lib.helpers as helpers
 from ckan.controllers.package import PackageController
@@ -259,6 +261,7 @@ class DatasetController(PackageController):
         except p.toolkit.ObjectNotFound:
             return p.toolkit.abort(404, p.toolkit._('Package not found'))
 
+        request_status = None
         try:
             task = p.toolkit.get_action('pending_task_for_dataset')(context,
                 {'name': dataset_name, 'id': pkg['id']})
@@ -266,8 +269,6 @@ class DatasetController(PackageController):
                 task['value'] = json.loads(task['value'])
                 request_status = p.toolkit.get_action('get_change_request')(context,
                     {'id': task['value'].get('request_id')})
-            else:
-                request_status = None
         except p.toolkit.ValidationError, e:
             helpers.flash_error('{0}'.format(e.error_dict['message']))
         except ECAPIError:
@@ -322,6 +323,20 @@ class DatasetController(PackageController):
             helpers.flash_error('The EC API returned and error: {0}'.format(str(e)))
 
             p.toolkit.redirect_to('approvals_list')
+        except p.toolkit.NotAuthorized:
+
+            return p.toolkit.abort(403, p.toolkit._('Not authorized to download this file'))
+
         else:
-            p.toolkit.response.headers = download['headers']
-            return download['content']
+            headers = []
+            for k, v in download['headers'].iteritems():
+                if k.lower() not in ('transfer-encoding', 'content-encoding'):
+                    headers.append((k, v))
+
+            app = paste.fileapp.DataApp(download['content'], headers=headers)
+
+            status, headers2, app_iter = p.toolkit.request.call_application(app)
+
+            p.toolkit.response.headers.update(headers2)
+
+            return app_iter
