@@ -1688,8 +1688,7 @@ def ec_superadmin_create(context, data_dict):
                                     entity_id=data_dict['user'],
                                     entity_type='member',
                                     key=key,
-                                    value=json.dumps(
-                                        {'data_dict': data_dict})
+                                    value=json.dumps({})
                                     )
 
     user = p.toolkit.get_action('user_show')(
@@ -2274,7 +2273,7 @@ def ec_user_create(context, data_dict):
                                     entity_type='user',
                                     # This will be used for validating datasets
                                     key=validated_data_dict['UserName'],
-                                    value={})
+                                    value=json.dumps({}))
 
     organization_id = validated_data_dict.pop('OrganisationId', None)
     if organization_id:
