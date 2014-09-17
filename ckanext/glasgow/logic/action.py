@@ -1141,7 +1141,11 @@ def check_for_task_status_update(context, data_dict):
         'Content-Type': 'application/json',
     }
 
-    response = requests.request(method, url, headers=headers)
+    verify_ssl = p.toolkit.asbool(
+        config.get('ckanext.glasgow.verify_ssl_certs', True)
+    )
+    response = requests.request(method, url, headers=headers,
+                                verify=verify_ssl)
     if response.status_code == requests.codes.ok:
         try:
             result = response.json()
@@ -1252,7 +1256,11 @@ def get_change_request(context, data_dict):
     except oauth2waad_plugin.ServiceToServiceAccessTokenError, e:
         raise ECAPIError(['EC API Error: Failed to get service auth {0}'.format(e.message)])
 
-    response = requests.request(method, url, headers=headers)
+    verify_ssl = p.toolkit.asbool(
+        config.get('ckanext.glasgow.verify_ssl_certs', True)
+    )
+    response = requests.request(method, url, headers=headers, 
+                                verify=verify_ssl)
     if response.status_code == requests.codes.ok:
         try:
             results = response.json()
@@ -1325,7 +1333,11 @@ def changelog_show(context, data_dict):
         'Content-Type': 'application/json',
     }
 
-    response = requests.request(method, url, headers=headers, params=params)
+    verify_ssl = p.toolkit.asbool(
+        config.get('ckanext.glasgow.verify_ssl_certs', True)
+    )
+    response = requests.request(method, url, headers=headers, params=params,
+                                verify=verify_ssl)
 
     content = response.json()
 
@@ -1506,9 +1518,13 @@ def send_request_to_ec_platform(method, url, data=None, headers=None,
             headers['Authorization'] = _get_api_auth_token()
 
     try:
+        verify_ssl = p.toolkit.asbool(
+            config.get('ckanext.glasgow.verify_ssl_certs', True)
+        )
         response = requests.request(method, url,
                                     data=data,
                                     headers=headers,
+                                    verify=verify_ssl,
                                     timeout=50,
                                     **kwargs
                                     )
@@ -1942,12 +1958,17 @@ def approvals_list(context, data_dict):
     if skip:
         params['$skip'] = skip
 
+    verify_ssl = p.toolkit.asbool(
+        config.get('ckanext.glasgow.verify_ssl_certs', True)
+    )
+
     headers = {
         'Authorization': _get_api_auth_token(),
         'Content-Type': 'application/json',
     }
 
-    response = requests.request(method, url, headers=headers, params=params)
+    response = requests.request(method, url, headers=headers, params=params,
+                                verify=verify_ssl)
 
     content = response.json()
 
@@ -2002,7 +2023,12 @@ def approval_act(context, data_dict):
         'Authorization': _get_api_auth_token(),
     }
 
-    response = requests.request(method, url, headers=headers)
+    verify_ssl = p.toolkit.asbool(
+        config.get('ckanext.glasgow.verify_ssl_certs', True)
+    )
+
+    response = requests.request(method, url, headers=headers,
+                                verify=verify_ssl)
 
     # Check status codes
 
@@ -2049,7 +2075,12 @@ def approval_download(context, data_dict):
         'Authorization': _get_api_auth_token(),
     }
 
-    response = requests.request(method, url, headers=headers)
+    verify_ssl = p.toolkit.asbool(
+        config.get('ckanext.glasgow.verify_ssl_certs', True)
+    )
+
+    response = requests.request(method, url, headers=headers,
+                                verify=verify_ssl)
 
     # Check status codes
 

@@ -79,7 +79,9 @@ def create_orgs(organization_id, site_user):
     api_url = config.get('ckanext.glasgow.metadata_api', '').rstrip('/')
     api_endpoint = '{}/Metadata/Organisation/{}'.format(api_url, organization_id)
 
-    request = requests.get(api_endpoint)
+    verify_ssl = toolkit.asbool(config.get('ckanext.glasgow.verify_ssl_certs', True))
+
+    request = requests.get(api_endpoint, verify=verify_ssl)
     try:
         result = _fetch_from_ec(request)
         org = result['MetadataResultSet'][0]

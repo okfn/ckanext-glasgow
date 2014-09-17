@@ -46,7 +46,11 @@ def ec_api(endpoint):
     skip = 0
 
     while True:
-        request = requests.get(endpoint, params={'$skip': skip})
+        verify_ssl = toolkit.asbool(
+            config.get('ckanext.glasgow.verify_ssl_certs', True)
+        )
+        request = requests.get(endpoint, params={'$skip': skip},
+                               verify=verify_ssl)
         result = _fetch_from_ec(request)
 
         if not result.get('MetadataResultSet'):
@@ -163,7 +167,11 @@ class EcInitialHarvester(EcHarvester):
             content = json.loads(harvest_object.content)
             org = content['OrganisationId']
             dataset = content['Id']
-            request = requests.get(api_endpoint.format(org, dataset))
+            verify_ssl = toolkit.asbool(
+                config.get('ckanext.glasgow.verify_ssl_certs', True)
+            )
+            request = requests.get(api_endpoint.format(org, dataset),
+                                   verify=verify_ssl)
             if request.status_code == 404:
                 result = False
                 log.debug('No files for dataset {0}'.format(dataset))
