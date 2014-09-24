@@ -278,6 +278,14 @@ def convert_ec_user_to_ckan_user(ec_dict):
 
     return ckan_dict
 
+
+def convert_ckan_user_to_ec_user(ckan_dict):
+    ec_dict = {}
+    for ckan_name, ec_name in ckan_to_ec_user_mapping.iteritems():
+        ec_dict[ec_name] = ckan_dict.get(ckan_name)
+    return ec_dict
+
+
 def create_package_schema():
     schema = default_create_package_schema()
 

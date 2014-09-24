@@ -1,0 +1,10 @@
+{% ckan_extends %}
+
+{% block content_primary_nav %}
+  {{ h.build_nav_icon('user_datasets', _('Datasets'), id=user.name) }}
+  {{ h.build_nav_icon('user_activity_stream', _('Activity Stream'), id=user.name) }}
+  {% if c.user and h.check_access('user_update', {'id': c.user.id}) %}
+    {{ h.build_nav_icon('pending_user_update', _('Pending Updates'), id=user.name) }}
+
+  {% endif %}
+{% endblock %}

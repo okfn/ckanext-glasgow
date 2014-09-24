@@ -123,3 +123,23 @@ class CreateUsersController(toolkit.BaseController):
             'requests': user_requests
         }
         return toolkit.render('create_users/pending.html', extra_vars=extra_vars)
+
+
+    def pending_user_update(self, id): 
+        context = {'model': model,
+                   'user': toolkit.c.user, 'auth_user_obj': toolkit.c.userobj}
+        try:
+            toolkit.check_access('user_update', context, {})
+        except toolkit.NotAuthorized:
+            toolkit.abort(401, toolkit._('Not authorized to see user updates'))
+
+        requests = toolkit.get_action('pending_user_tasks')(context, {'id': id})
+        user = toolkit.get_action('user_show')(context, {'id': id})
+
+        toolkit.c.user_dict = user
+
+        extra_vars = {
+            'requests': requests,
+            'user': user,
+        }
+        return toolkit.render('user/pending_update.html', extra_vars=extra_vars)

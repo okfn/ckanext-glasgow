@@ -92,6 +92,9 @@ class GlasgowSchemaPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         map.connect('pending_user_requests', '/pending_user_requests',
                     controller='ckanext.glasgow.controllers.create_user:CreateUsersController',
                     action='pending_users')
+        map.connect('pending_user_update', '/user/pending_updates/{id}',
+                    controller='ckanext.glasgow.controllers.create_user:CreateUsersController',
+                    action='pending_user_update')
         return map
 
     # IConfigurer
@@ -147,6 +150,7 @@ class GlasgowSchemaPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             'organization_list_for_user',
             'user_role_update',
             'user_role_delete',
+            'user_update',
             'ec_user_show',
             'ec_user_list',
             'ec_user_create',

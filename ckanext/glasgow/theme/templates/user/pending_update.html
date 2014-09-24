@@ -1,0 +1,25 @@
+{% extends "user/read_base.html" %}
+
+{% block subtitle %}{{ _('Pending User Updates') }} - {{ super() }}{% endblock %}
+
+{% block primary_content_inner %}
+  {% if requests %}
+  <table id="pending-members" class="table table-bordered">
+    <thead>
+      <th>Request ID</th>
+    </thead>
+    <tbody>
+    {% for task in requests %}
+      <tr>
+        <td>
+          <a href="{%  url_for controller='ckanext.glasgow.controllers.request_status:RequestStatusController', action='get_status', request_id=task.value.request_id %}">
+          {{ task.value.request_id }}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    No pending user updates
+  {% endif %}
+{% endblock %}

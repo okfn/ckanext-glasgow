@@ -221,6 +221,14 @@ def _get_api_endpoint(operation):
             'POST',
             '/Users',
             write_base),
+        'user_request_update': (
+            'PUT',
+            '/Users/User/{user_id}',
+            write_base),
+        'user_request_update_in_org': (
+            'PUT',
+            '/Users/Organisation/{organization_id}/User/{user_id}',
+            write_base),
         'user_in_organization_request_create': (
             'POST',
             '/Users/Organisation/{organization_id}',
@@ -389,8 +397,8 @@ def pending_user_tasks(context, data_dict):
                 )
     if user_id:
         tasks = tasks.filter(or_(
-                model.TaskStatus.key == id,
-                model.TaskStatus.entity_id == id,
+                #model.TaskStatus.key == user_id,
+                model.TaskStatus.entity_id == user_id,
                 ))
     tasks = tasks.order_by(model.TaskStatus.last_updated.desc())
 
@@ -2410,4 +2418,92 @@ def file_version_request_create(context, data_dict):
     return {
         'request_id': request['RequestId'],
         'task_id': task_dict['id'],
+    }
+
+
+def user_update(context, data_dict):
+    if data_dict.get('__local_action', False):
+        context['local_action'] = True
+        data_dict.pop('__local_action', None)
+
+    if (context.get('local_action', False) or
+            data_dict.get('type') == 'harvest' or
+            data_dict.get('source_type')):
+        return core_actions.update.user_update(context, data_dict)
+    else:
+        check_access('user_update', context, data_dict)
+        user_id  = p.toolkit.get_or_bust(data_dict, 'id')
+
+        if not user_id:
+            raise p.toolkit.ValidationError(['id is required'])
+
+        ckan_user = p.toolkit.get_action('user_show')(context, {'id': user_id})
+        try:
+            # check if the user is a CTPEC user
+            ec_user = p.toolkit.get_action('ec_user_show')(
+                context,
+                {'ec_username': ckan_user['name']}
+            )
+        except ECAPINotFound:
+            ec_user = None
+
+        if not ec_user:
+            return core_actions.update.user_update(context, data_dict)
+        else:
+            return ec_user_update(context, data_dict)
+            
+
+
+def ec_user_update(context, data_dict):
+    ec_dict = custom_schema.convert_ckan_user_to_ec_user(data_dict)
+    ec_user = p.toolkit.get_action('ec_user_show')(
+        context,
+        {'ec_username': data_dict['name']},
+    )
+
+    ec_user.update(ec_dict)
+
+
+    key = '{0}@{1}'.format(data_dict.get('name', data_dict['id']),
+                           datetime.datetime.now().isoformat())
+
+    task_context = {'model': model, 'session': model.Session}
+    task_dict = _create_task_status(task_context,
+                                task_type='user_request_update',
+                                entity_id=data_dict['id'],
+                                entity_type='user',
+                                key=key,
+                                value=json.dumps({}),
+                                )
+
+    if ec_user.get('OrganisationId'):
+        method, url = _get_api_endpoint('user_request_update_in_org')
+        url = url.format(organization_id=ec_user['OrganisationId'],
+                         user_id=data_dict['id'])
+    else:
+        method, url = _get_api_endpoint('user_request_update')
+        url = url.format(user_id=data_dict['id'])
+
+    content = send_request_to_ec_platform(method, url,
+                                          data=json.dumps(ec_dict),
+                                          context=task_context,
+                                          task_dict=task_dict)
+    try:
+        request_id = content['RequestId']
+    except KeyError:
+        error_dict = {
+            'message': ['RequestId not in response from EC Platform'],
+            'content': [json.dumps(content)],
+        }
+        raise p.toolkit.ValidationError(error_dict)
+
+    task_dict = _update_task_status_success(task_context, task_dict, {
+        'request_id': request_id,
+    })
+    helpers.flash_success('user update has been requested with request id {0}'.format(request_id))
+
+    return {
+        'task_id': task_dict['id'],
+        'request_id': request_id,
+        'name': data_dict['name'],
     }

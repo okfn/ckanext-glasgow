@@ -1861,3 +1861,116 @@ class TestFileVersionCreate(object):
             },
             task_dict
         )
+
+
+class TestUserUpdate(object):
+    def setup(self):
+        self.normal_user = helpers.call_action('user_create',
+                                              name='normal_user',
+                                              email='test@test.com',
+                                              password='test')
+
+    def teardown(cls):
+        helpers.reset_db()
+
+    @mock.patch('requests.request')
+    def test_user_update(self, mock_request):
+        content =  {
+            'RequestId': 'requestid',
+            "UserId": "7795f996-dbec-41e7-8330-36076cc7737e",
+            "UserName": "normal_user",
+            "OrganisationId": None,
+            "Email": "braeden_grimes@alias.com",
+            "FirstName": "Braeden",
+            "LastName": "Grimes",
+            "DisplayName": "Braeden Grimes",
+            "About": "Repellat consequatur sed blanditiis a vel recusandae.",
+            "Roles": [
+                "Member"
+                ],
+            "IsRegistered": False
+            }
+        mock_request.return_value = mock.Mock(
+            status_code=200,
+            content=json.dumps(content),
+            **{
+                'raise_for_status.side_effect': None,
+                'json.return_value': content,
+            }
+        )
+        context = {'user': self.normal_user['name']}
+        
+        test = self.normal_user.copy()
+        test['fullname'] = 'updated'
+
+        
+        request_dict = helpers.call_action('user_update',
+                                           context=context,
+                                           **test)
+
+        task_dict = helpers.call_action('task_status_show',
+                                        id=request_dict['task_id'])
+        nose.tools.assert_dict_contains_subset(
+            {
+                'task_type': u'user_update',
+                'entity_type': u'user',
+                'state': u'sent',
+                'error': None
+            },
+            task_dict
+        )
+        nose.tools.assert_equals(
+            ('PUT', '/Users/User/{}'.format(self.normal_user['id'])),
+            mock_request.call_args[0]
+        )
+
+    @mock.patch('requests.request')
+    def test_user_update_in_org(self, mock_request):
+        content =  {
+            'RequestId': 'requestid',
+            "UserId": "7795f996-dbec-41e7-8330-36076cc7737e",
+            "UserName": "normal_user",
+            "OrganisationId": 'some_org',
+            "Email": "braeden_grimes@alias.com",
+            "FirstName": "Braeden",
+            "LastName": "Grimes",
+            "DisplayName": "Braeden Grimes",
+            "About": "Repellat consequatur sed blanditiis a vel recusandae.",
+            "Roles": [
+                "Member"
+                ],
+            "IsRegistered": False
+            }
+        mock_request.return_value = mock.Mock(
+            status_code=200,
+            content=json.dumps(content),
+            **{
+                'raise_for_status.side_effect': None,
+                'json.return_value': content,
+            }
+        )
+        context = {'user': self.normal_user['name']}
+        
+        test = self.normal_user.copy()
+        test['fullname'] = 'updated'
+
+        
+        request_dict = helpers.call_action('user_update',
+                                           context=context,
+                                           **test)
+
+        task_dict = helpers.call_action('task_status_show',
+                                        id=request_dict['task_id'])
+        nose.tools.assert_dict_contains_subset(
+            {
+                'task_type': u'user_update',
+                'entity_type': u'user',
+                'state': u'sent',
+                'error': None
+            },
+            task_dict
+        )
+        nose.tools.assert_equals(
+            ('PUT', '/Users/Organisation/{}/User/{}'.format('some_org', self.normal_user['id'])),
+            mock_request.call_args[0]
+        )
