@@ -13,5 +13,7 @@
   {{ h.build_nav_icon('dataset_groups', _('Groups'), id=pkg.name) }}
   {{ h.build_nav_icon('dataset_activity', _('Activity Stream'), id=pkg.name) }}
   {{ h.build_nav_icon('related_list', _('Related'), id=pkg.name) }}
-  {{ h.build_nav_icon('dataset_change_requests', _('Pending Changes'), dataset_name=pkg.name) }}
+  {% if h.check_access('package_update', {'id':pkg.id }) %}
+    {{ h.build_nav_icon('dataset_change_requests', _('Pending Changes'), dataset_name=pkg.name) }}
+  {% endif %}
 {% endblock %}

@@ -10,5 +10,7 @@
 
 {% block content_primary_nav %}
   {{ super() }}
-  {{ h.build_nav_icon('organization_change_requests', _('Pending Changes'), organization_name=c.group_dict.name) }}
+  {% if h.organizations_available(permission='admin') %}
+    {{ h.build_nav_icon('organization_change_requests', _('Pending Changes'), organization_name=c.group_dict.name) }}
+  {% endif %}
 {% endblock %}
