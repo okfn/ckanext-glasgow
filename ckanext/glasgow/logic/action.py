@@ -2461,13 +2461,19 @@ def ec_user_update(context, data_dict):
         {'ec_username': data_dict['name']},
     )
 
-    keys = set(['UserName', 'IsRegisteredUser', 'Email', 'FirstName',
+    keys = set(['UserName', 'IsRegistered', 'Email', 'FirstName',
                 'LastName', 'DisplayName', 'About'])
 
+    required = set(['UserName', 'Email', 'FirstName', 'LastName',
+                    'DisplayName'])
     current_dict = dict((k, v) for (k, v) in ec_user.items() if k in keys)
     update_dict = dict((k, v) for (k, v) in ec_dict.items() if k in keys)
 
     current_dict.update(update_dict)
+
+    for k in required:
+        if not current_dict.get(k, None):
+            current_dict[k] = 'None'
 
     key = '{0}@{1}'.format(data_dict.get('name', data_dict['id']),
                            datetime.datetime.now().isoformat())
