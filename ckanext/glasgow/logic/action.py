@@ -2461,8 +2461,13 @@ def ec_user_update(context, data_dict):
         {'ec_username': data_dict['name']},
     )
 
-    ec_user.update(ec_dict)
+    keys = set(['UserName', 'IsRegisteredUser', 'Email', 'FirstName',
+                'LastName', 'DisplayName', 'About'])
 
+    current_dict = dict((k, v) for (k, v) in ec_user.items() if k in keys)
+    update_dict = dict((k, v) for (k, v) in ec_dict.items() if k in keys)
+
+    current_dict.update(update_dict)
 
     key = '{0}@{1}'.format(data_dict.get('name', data_dict['id']),
                            datetime.datetime.now().isoformat())
@@ -2479,13 +2484,13 @@ def ec_user_update(context, data_dict):
     if ec_user.get('OrganisationId'):
         method, url = _get_api_endpoint('user_request_update_in_org')
         url = url.format(organization_id=ec_user['OrganisationId'],
-                         user_id=data_dict['id'])
+                         user_id=ec_user['UserId'])
     else:
         method, url = _get_api_endpoint('user_request_update')
-        url = url.format(user_id=data_dict['id'])
+        url = url.format(user_id=ec_user['UserId'])
 
     content = send_request_to_ec_platform(method, url,
-                                          data=json.dumps(ec_dict),
+                                          data=json.dumps(current_dict),
                                           context=task_context,
                                           task_dict=task_dict)
     try:
