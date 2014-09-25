@@ -2470,6 +2470,7 @@ def ec_user_update(context, data_dict):
     update_dict = dict((k, v) for (k, v) in ec_dict.items() if k in keys)
 
     current_dict.update(update_dict)
+    current_dict['IsRegisteredUser'] = current_dict.pop('IsRegistered', False)
 
     for k in required:
         if not current_dict.get(k, None):
