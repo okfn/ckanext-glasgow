@@ -2468,6 +2468,7 @@ def ec_user_update(context, data_dict):
                     'DisplayName'])
     current_dict = dict((k, v) for (k, v) in ec_user.items() if k in keys)
     update_dict = dict((k, v) for (k, v) in ec_dict.items() if k in keys)
+    update_dict.pop('UserName', None)
 
     current_dict.update(update_dict)
     current_dict['IsRegisteredUser'] = current_dict.pop('IsRegistered', False)
