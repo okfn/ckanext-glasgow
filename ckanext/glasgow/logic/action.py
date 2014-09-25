@@ -2197,9 +2197,8 @@ def file_request_delete(context, data_dict):
     try:
         resource_dict = p.toolkit.get_action('resource_show')(context,
                                                               {'id': resource_id})
+
         # Add some extra fields needed to display the pending deletion on the frontend
-        data_dict['name'] = resource_dict['name']
-        data_dict['description'] = resource_dict['description']
 
         dataset_id = (resource_dict.get('package_id') or
                       resource_dict.get('DataSetId') or
@@ -2223,6 +2222,19 @@ def file_request_delete(context, data_dict):
 
         if not data_dict.get('version_id'):
             raise p.toolkit.ObjectNotFound('No version id found for resource')
+
+        versions = p.toolkit.get_action('resource_versions_show')(context,
+            {'package_id': dataset_id, 'resource_id': resource_id})
+        
+        version = None
+        for v in versions:
+            if v['version'] == data_dict['version_id']:
+                version = v
+                break
+
+        data_dict['name'] = version['name']
+        data_dict['description'] = version['description']
+
     except p.toolkit.ObjectNotFound:
         raise p.toolkit.ObjectNotFound('Resource not found')
 

@@ -10,7 +10,7 @@
     {% for pending_resource in pending_resources %}
     <li class="resource-item" id="pending-{{ loop.index }}">
       {% if pending_resource.value.data_dict.version_id %}
-      <a class="heading" href="{%  url_for controller='ckanext.glasgow.controllers.request_status:RequestStatusController', action='get_status', request_id=pending_resource.value.request_id %}">{{ pending_resource.value.data_dict.name }} <p> {{ pending_resource.value.data_dict.version_id }}
+      <a class="heading" href="{%  url_for controller='ckanext.glasgow.controllers.request_status:RequestStatusController', action='get_status', request_id=pending_resource.value.request_id %}">{{ pending_resource.value.data_dict.name }} <p> 
         <p> [{{ pending_resource.task_type.replace('file_request_', 'version ') }}]
       {% else %}
         <a class="heading" href="{%  url_for controller='ckanext.glasgow.controllers.request_status:RequestStatusController', action='get_status', request_id=pending_resource.value.request_id %}">{{ pending_resource.value.data_dict.name }}
