@@ -29,6 +29,7 @@ from ckanext.glasgow.logic.validators import (
     url_name_validator,
     unique_package_name,
     extra_key_not_in_resource_root_schema,
+    extra_key_not_in_root_schema,
 )
 
 
@@ -297,7 +298,13 @@ def create_package_schema():
         unique_title_within_organization,
         no_pending_dataset_with_same_title_in_same_org,
     ])
+    schema['extras'] = custom_extras_schema()
 
+    return schema
+
+def custom_extras_schema():
+    schema = default_extras_schema()
+    schema['key'] = [not_empty, extra_key_not_in_root_schema, unicode]
     return schema
 
 
