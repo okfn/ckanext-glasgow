@@ -380,13 +380,13 @@ def extra_key_not_in_resource_root_schema(key, data, errors, context):
 
     for schema_key in context.get('schema_keys', []):
         if schema_key == data[key]:
-            raise Invalid(_('"{}" clashes with an existing a schema field with'
-                            ' the same name'.format(schema_key)))
+            raise Invalid(_('"{}" clashes with an existing reserved schema field'
+                            ' that has the same name'.format(schema_key)))
 
 
 def extra_key_not_in_root_schema(key, data, errors, context):
 
     for schema_key in context.get('schema_keys', []):
         if schema_key == data[key]:
-            raise Invalid(_('"{}" clashes with an existing a schema field with'
-                            ' the same name'.format(schema_key)))
+            raise Invalid(_('"{}" clashes with an existing reserved schema field'
+                            ' that has the same name'.format(schema_key)))
