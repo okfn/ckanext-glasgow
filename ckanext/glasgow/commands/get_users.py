@@ -50,24 +50,31 @@ def create_user(ec_dict):
         if is_admin:
             data_dict['sysadmin'] = True
 
-        user = toolkit.get_action('user_create')(context, data_dict)
-        if ec_dict.get('OrganisationId') and not is_admin:
-            context = {
-                'ignore_auth': True,
-                'model': model,
-                'user': site_user['name'],
-                'session': model.Session,
-                'local_action': True,
-            }
-            member_dict = convert_ec_member_to_ckan_member(ec_dict)
-            try:
-                org = toolkit.get_action('organization_show')(context, {'id': member_dict['id']})
-            except toolkit.ObjectNotFound, e:
-                org = create_orgs(member_dict['id'], site_user['name'])
-            if org:
-                toolkit.get_action('organization_member_create')(context, member_dict)
+        is_external = [ i for i 
+                        in ec_dict.get('Roles', [])
+                        if i in ['ExternalService', 'ExternalPortal']
+                      ]
+        if not is_external:
+            user = toolkit.get_action('user_create')(context, data_dict)
+            if ec_dict.get('OrganisationId') and not is_admin:
+                context = {
+                    'ignore_auth': True,
+                    'model': model,
+                    'user': site_user['name'],
+                    'session': model.Session,
+                    'local_action': True,
+                }
+                member_dict = convert_ec_member_to_ckan_member(ec_dict)
+                try:
+                    org = toolkit.get_action('organization_show')(context, {'id': member_dict['id']})
+                except toolkit.ObjectNotFound, e:
+                    org = create_orgs(member_dict['id'], site_user['name'])
+                if org:
+                    toolkit.get_action('organization_member_create')(context, member_dict)
 
-        return user
+            return user
+        else:
+            log.debug('skipping ExternalService/ExternalPortal user')
     except toolkit.ValidationError, e:
         if e.error_dict.get('name') == [u'That login name is not available.']:
             print 'username exists skipping'
