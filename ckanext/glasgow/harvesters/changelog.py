@@ -51,6 +51,17 @@ class EcChangelogHarvester(EcHarvester):
 
         }
 
+    def get_username_from_audit(self, audit):
+        username = audit.get('Owner', None)
+        if username:
+            try:
+                p.toolkit.get_action('user_show', {'id': username})
+            except p.toolkit.ObjectNotFound:
+                username = self._get_user_name()
+        else:
+            username = self._get_user_name()
+        return username
+
     def gather_stage(self, harvest_job):
         log.debug('In ChangelogHarvester gather_stage')
 
@@ -129,7 +140,7 @@ class EcChangelogHarvester(EcHarvester):
         context = {
             'model': model,
             'ignore_auth': True,
-            'user': self._get_user_name(),
+            'user': self.get_username_from_audit(audit),
             'local_action': True,
         }
 
