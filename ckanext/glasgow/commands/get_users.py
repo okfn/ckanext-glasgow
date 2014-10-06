@@ -52,7 +52,7 @@ def create_user(ec_dict):
 
         is_external = [ i for i 
                         in ec_dict.get('Roles', [])
-                        if i in ['ExternalService', 'ExternalPortal']
+                        if i in ['ExternalService', 'ExternalPortal', 'InternalServices']
                       ]
         if not is_external:
             user = toolkit.get_action('user_create')(context, data_dict)
