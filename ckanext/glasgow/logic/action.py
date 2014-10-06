@@ -9,7 +9,8 @@ import urlparse
 
 import dateutil.parser
 import requests
-from sqlalchemy import or_
+from sqlalchemy import or_, and_, desc, case, func
+from sqlalchemy.sql import select
 
 from pylons import config, session
 
@@ -2532,3 +2533,84 @@ def ec_user_update(context, data_dict):
         'request_id': request_id,
         'name': data_dict['name'],
     }
+
+
+
+def user_list(context, data_dict):
+    '''Return a list of the site's user accounts.
+
+    :param q: restrict the users returned to those whose names contain a string
+      (optional)
+    :type q: string
+    :param order_by: which field to sort the list by (optional, default:
+      ``'name'``)
+    :type order_by: string
+
+    :rtype: list of dictionaries
+
+    '''
+    model = context['model']
+
+    p.toolkit.check_access('user_list',context, data_dict)
+
+    q = data_dict.get('q','')
+    order_by = data_dict.get('order_by','name')
+
+
+    query = model.Session.query(
+        model.User,
+        model.User.name.label('name'),
+        model.User.fullname.label('fullname'),
+        model.User.about.label('about'),
+        model.User.about.label('email'),
+        model.User.created.label('created'),
+        select([func.count(model.Revision.id)], or_(
+                model.Revision.author==model.User.name,
+                model.Revision.author==model.User.openid
+                )
+        ).label('number_of_edits'),
+        select([func.count(model.UserObjectRole.id)], and_(
+            model.UserObjectRole.user_id==model.User.id,
+            model.UserObjectRole.context=='Package',
+            model.UserObjectRole.role=='admin'
+            )
+        ).label('number_administered_packages')
+    )
+
+    if q:
+        query = model.User.search(q, query, user_name=context.get('user'))
+
+    if order_by == 'edits':
+        query = query.order_by(desc(
+            select([func.count(model.Revision.id)], or_(
+                model.Revision.author==model.User.name,
+                model.Revision.author==model.User.openid
+                ))
+        ))
+    else:
+        query = query.order_by(
+            case([(or_(model.User.fullname == None, model.User.fullname == ''),
+                   model.User.name)],
+                 else_=model.User.fullname)
+        )
+
+    # Filter deleted users
+    query = query.filter(model.User.state != model.State.DELETED)
+
+    # If you're not a sysadmin, filter out the sysadmin users
+    user = context.get('user')
+    sysadmin = new_authz.is_sysadmin(user)
+    if not sysadmin:
+        query = query.filter(model.User.sysadmin==False)
+
+    ## hack for pagination
+    if context.get('return_query'):
+        return query
+
+    users_list = []
+
+    for user in query.all():
+        result_dict = model_dictize.user_dictize(user[0], context)
+        users_list.append(result_dict)
+
+    return users_list
