@@ -55,7 +55,12 @@ class EcChangelogHarvester(EcHarvester):
         username = audit.get('Owner', None)
         if username:
             try:
-                p.toolkit.get_action('user_show', {'id': username})
+                context = {
+                    'model': model,
+                    'ignore_auth': True,
+                    'local_action': True,
+                }
+                p.toolkit.get_action('user_show')(context, {'id': username})
             except p.toolkit.ObjectNotFound:
                 username = self._get_user_name()
         else:
