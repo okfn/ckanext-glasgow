@@ -54,6 +54,7 @@ class EcChangelogHarvester(EcHarvester):
     def get_username_from_audit(self, audit):
         username = audit.get('Owner', None)
         if username:
+            username = username.lower()
             try:
                 context = {
                     'model': model,
