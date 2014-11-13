@@ -98,13 +98,16 @@ This first section is only to be run when reseting an existing instance. If you 
     git pull
 
     # Clean DB
-    ckan db clean
+    ckan db clear
 
     # Clean serch index
     ckan search-index clean
 
     # Init DB
     ckan db init
+
+    # Create OKFN sysadmin user
+    /usr/lib/ckan/default/bin/paster --plugin=ckan sysadmin add okfn -c /etc/ckan/default/production.ini
 
     # Start harvester processes
     supervisorctl start all
