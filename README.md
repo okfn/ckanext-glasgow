@@ -98,10 +98,10 @@ This first section is only to be run when reseting an existing instance. If you 
     git pull
 
     # Clean DB
-    ckan db clear
+    ckan db clean
 
-    # Clean serch index
-    ckan search-index clean
+    # Clear serch index
+    ckan search-index clear
 
     # Init DB
     ckan db init
