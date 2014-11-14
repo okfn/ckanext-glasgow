@@ -1,0 +1,76 @@
+#!/bin/bash
+#
+# reset-ckan:
+#   script to reset ckan.
+#
+# Copyright (c) 2014 Open Knowledge Foundation. All rights reserved.
+# Email: <adam.mcgreggor@okfn.org>
+#
+# $Id:$
+#
+
+set -e
+
+CKANROOT=/usr/lib/ckan/default
+CONFIGFILE=/etc/ckan/default/production.ini
+
+# am i root?
+if [ x"$(id -u)" != "x0" ]; then
+    echo "This needs to be run as root. Become root and try again"
+    exit 23
+fi
+
+# Stop Apache
+service apache2 stop
+
+# Stop harvester processes
+supervisorctl stop all
+
+# Update source (repeat for ckanext-oauth2waad if necessary)
+for D in ckanext-glasgow ckanext-oauth2waad
+do
+    cd ${CKANROOT}/src/${D} && git pull || echo "could not update extensions" && exit 24
+done
+
+# Clean DB
+ckan db clean
+
+# Clear serch index
+ckan search-index clear
+
+# Init DB
+ckan db init
+
+# Create OKFN sysadmin user
+${CKANROOT}/bin/paster --plugin=ckan sysadmin add okfn -c ${CONFIGFILE}
+
+# Start harvester processes
+supervisorctl start all
+
+# Create initial harvest source
+ckan --plugin=ckanext-harvest harvester source ec-initial-harvester url_initial ec_initial_harvester "EC Initial harvester" -c ${CONFIGFILE}
+
+# hack to get the source-id from above:
+SOURCEID="$(ckan --plugin=ckanext-harvest harvester sources 2>&1 | \
+    awk -F: '/Source id/ {print $NF}' | tail -n 1 | \ 
+    sed -e 's/^[ \t]*//')"
+
+# Manually add a job for the initial harvester
+ckan --plugin=ckanext-harvest harvester job "${SOURCEID}"
+
+# Force a run of the harvesters to run the previous job
+ckan --plugin=ckanext-harvest harvester run
+
+# Once it's finished, create the initial users
+ckan --plugin=ckanext-glasgow get_initial_users
+
+# Update the current audit id for the changelog harvester to the latest one
+ckan --plugin=ckanext-glasgow changelog_audit set
+
+# Create changelog harvest source
+ckan --plugin=ckanext-harvest harvester source ec-changelog-harvester url_changelog ec_changelog_harvester "EC Changelog harvester" True "" ALWAYS -c ${CONFIGFILE}
+
+# Start Apache
+service apache2 start
+
+# vim:tabstop=4:expandtab:shiftwidth=4
