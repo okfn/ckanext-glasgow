@@ -143,5 +143,17 @@ class GetInitialUsers(CkanCommand):
             'user': site_user['name'],
             'session': model.Session
         }
-        ec_user_list = toolkit.get_action('ec_user_list')(context, {})
+        top = 100
+        skip = 0
+        ec_user_list = []
+        while True:
+            print skip
+            result = toolkit.get_action('ec_user_list')(context, {'skip': skip})
+
+            if not len(result) or (len(ec_user_list) and result[-1] == ec_user_list[-1]):
+                break
+            else:
+                ec_user_list.extend(result)
+
+                skip += top
         _create_users(ec_user_list)

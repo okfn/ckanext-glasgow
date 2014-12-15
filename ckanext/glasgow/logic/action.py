@@ -1886,9 +1886,13 @@ def ec_user_list(context, data_dict):
 
 
     top = data_dict.get('top')
+    skip = data_dict.get('skip')
     params = {}
     if top:
         params['$top'] = top
+    if skip:
+        params['$skip'] = skip
+
     try:
         access_token = oauth2.service_to_service_access_token('identity')
     except oauth2.ServiceToServiceAccessTokenError:
